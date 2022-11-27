@@ -1,0 +1,57 @@
+{
+    "name": "jojostx/larasubs",
+    "description": "Flexible plans and subscription management system for Laravel, with the required tools to run your SAAS like services efficiently",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ari Jay",
+            "email": "ikuskid7@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.0|^8.1",
+        "aglipanci/laravel-eloquent-case": "^1.4",
+        "illuminate/console": "^8.0|^9.0",
+        "illuminate/contracts": "^8.0|^9.0",
+        "illuminate/database": "^8.0|^9.0",
+        "illuminate/support": "^8.0|^9.0",
+        "spatie/eloquent-sortable": "^4.0",
+        "spatie/laravel-sluggable": "^3.4",
+        "spatie/laravel-translatable": "^6.1"
+    },
+    "require-dev": {
+        "lucasdotvin/laravel-database-queries-counter": "^0.5.0",
+        "orchestra/testbench": "^5.0|^6.0|^7.0",
+        "phpunit/phpunit": "^9.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Jojostx\\Larasubs\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Jojostx\\Larasubs\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Jojostx\\Larasubs\\LarasubsServiceProvider"
+            ],
+            "aliases": {}
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
