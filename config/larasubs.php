@@ -25,12 +25,4 @@ return [
     'feature_plan' => \Jojostx\Larasubs\Models\FeaturePlan::class,
     'feature_subscription' => \Jojostx\Larasubs\Models\FeatureSubscription::class,
   ],
-
-  'plan' => [
-    // The value should be a valid schema builder blueprint column definition method
-    'price_column_type' => 'unsignedInteger',
-
-    // The cast for the price attribute on the plan model
-    'price_column_cast' => 'integer',
-  ]
 ];

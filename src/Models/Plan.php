@@ -2,7 +2,6 @@
 
 namespace Jojostx\Larasubs\Models;
 
-use App\Models\Price;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -45,7 +44,7 @@ class Plan extends Model
     protected $casts = [
         'slug' => 'string',
         'active' => 'boolean',
-        'price' => Price::class,
+        'price' => 'integer',
         'currency' => 'string',
         'interval' => 'integer',
         'interval_type' => 'string',

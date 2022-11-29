@@ -82,7 +82,7 @@ class SubscriptionTest extends TestCase
     });
   }
 
-  public function testModelPlanCanBeChanged()
+  public function test_model_plan_can_be_changed()
   {
     Carbon::setTestNow(now());
 
@@ -118,7 +118,7 @@ class SubscriptionTest extends TestCase
     ]);
   }
 
-  public function testModelRenews()
+  public function test_model_renews()
   {
     Carbon::setTestNow(now());
 
@@ -147,7 +147,7 @@ class SubscriptionTest extends TestCase
     ]);
   }
 
-  public function testModelRenewsBasedOnCurrentDateIfOverdue()
+  public function test_model_renews_based_on_current_date_if_overdue()
   {
     Carbon::setTestNow(now());
 
@@ -176,7 +176,7 @@ class SubscriptionTest extends TestCase
     ]);
   }
 
-  public function testModelCanStart()
+  public function test_model_can_start()
   {
     Carbon::setTestNow(now());
 
@@ -200,7 +200,7 @@ class SubscriptionTest extends TestCase
     ]);
   }
 
-  public function testModelCanScheduleStart()
+  public function test_model_can_schedule_start()
   {
     Carbon::setTestNow(now());
 
@@ -224,7 +224,7 @@ class SubscriptionTest extends TestCase
     ]);
   }
 
-  public function testModelCanCancel()
+  public function test_model_can_cancel()
   {
     Carbon::setTestNow(now());
 
@@ -248,7 +248,7 @@ class SubscriptionTest extends TestCase
     ]);
   }
 
-  public function testModelCanBeCancelledImmediately()
+  public function test_model_can_be_cancelled_immediately()
   {
     Carbon::setTestNow(now());
 
@@ -272,7 +272,7 @@ class SubscriptionTest extends TestCase
     ]);
   }
 
-  public function testModelConsidersGracePeriodOnOverdue()
+  public function test_model_considers_grace_period_on_overdue()
   {
     Carbon::setTestNow(now());
 
@@ -287,7 +287,7 @@ class SubscriptionTest extends TestCase
     $this->assertTrue($subscription->isOnGracePeriod());
   }
 
-  public function testModelWhereActiveScope()
+  public function test_model_where_active_scope()
   {
     Subscription::factory()
       ->count($this->faker()->randomDigitNotNull())
@@ -306,7 +306,7 @@ class SubscriptionTest extends TestCase
     );
   }
 
-  public function testModelWhereNotActiveScope()
+  public function test_model_where_not_active_scope()
   {
     Subscription::factory()
       ->count($this->faker()->randomDigitNotNull())
@@ -331,7 +331,7 @@ class SubscriptionTest extends TestCase
     );
   }
 
-  public function testModelReturnsNotStartedSubscriptionsInNotActiveScope()
+  public function test_model_returns_not_started_subscriptions_on_not_active_scope()
   {
     Subscription::factory()
       ->count($this->faker()->randomDigitNotNull())
@@ -356,7 +356,7 @@ class SubscriptionTest extends TestCase
     );
   }
 
-  public function testModelReturnsEndedSubscriptionsInNotActiveScope()
+  public function test_model_returns_ended_subscriptions_on_not_active_scope()
   {
     Subscription::factory()
       ->count($this->faker()->randomDigitNotNull())
@@ -380,7 +380,7 @@ class SubscriptionTest extends TestCase
     );
   }
 
-  public function testModelReturnsCancelledSubscriptionsInNotActiveScope()
+  public function test_model_returns_cancelled_subscriptions_on_not_active_scope()
   {
     Subscription::factory()
       ->count($this->faker()->randomDigitNotNull())
@@ -404,7 +404,7 @@ class SubscriptionTest extends TestCase
     );
   }
 
-  public function testModelReturnsOnlyCancelledSubscriptionsWithTheScope()
+  public function test_model_returns_only_cancelled_subscriptions_with_scope()
   {
     Subscription::factory()
       ->count($this->faker()->randomDigitNotNull())
@@ -428,7 +428,7 @@ class SubscriptionTest extends TestCase
     );
   }
 
-  public function testModelReturnsOnlyNotCancelledSubscriptionsWithTheScope()
+  public function test_model_returns_only_not_cancelled_subscriptions_with_scope()
   {
     Subscription::factory()
       ->count($this->faker()->randomDigitNotNull())
@@ -454,7 +454,7 @@ class SubscriptionTest extends TestCase
     );
   }
 
-  public function testOnlyStartedModelsAreReturnedByScope()
+  public function test_only_started_subscriptions_are_returned_by_scope()
   {
     $startedModelsCount = $this->faker()->randomDigitNotNull();
     $startedModels = Subscription::factory()->count($startedModelsCount)->create([
@@ -476,7 +476,7 @@ class SubscriptionTest extends TestCase
     );
   }
 
-  public function testOnlyNotStartedModelsAreReturnedByScope()
+  public function test_only_not_started_models_are_returned_by_scope()
   {
     $startedModelsCount = $this->faker()->randomDigitNotNull();
     Subscription::factory()->count($startedModelsCount)->create([
@@ -498,7 +498,7 @@ class SubscriptionTest extends TestCase
     );
   }
 
-  public function testOnlyTriallingModelsAreReturnedByScope()
+  public function test_only_trialling_subscriptions_are_returned_by_scope()
   {
     $startedModelsCount = $this->faker()->randomDigitNotNull();
     Subscription::factory()->count($startedModelsCount)->create([
@@ -521,7 +521,7 @@ class SubscriptionTest extends TestCase
     );
   }
 
-  public function testOnlyOverdueModelsAreReturnedByScope()
+  public function test_only_overdue_subscriptions_are_returned_by_scope()
   {
     $startedModelsCount = $this->faker()->randomDigitNotNull();
     Subscription::factory()
