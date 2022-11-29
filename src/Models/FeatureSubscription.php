@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Jojostx\Larasubs\Models\Concerns\Ends;
 
 class FeatureSubscription extends Model
 {

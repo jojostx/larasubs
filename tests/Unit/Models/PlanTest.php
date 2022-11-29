@@ -156,16 +156,6 @@ class PlanTest extends TestCase
     $this->assertEquals('test-plan', $plan->slug);
   }
 
-  public function test_model_has_translatable_slug()
-  {
-    $plan = Plan::factory()->create(['name' => 'Name in English']);
-    $plan
-      ->setTranslation('name', 'nl', 'Naam in het Nederlands')
-      ->save();
-
-    $this->assertEquals('naam-in-het-nederlands', $plan->getTranslation('slug', 'nl'));
-  }
-
   public function test_model_has_grace()
   {
     Carbon::setTestNow(now());

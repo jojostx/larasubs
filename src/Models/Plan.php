@@ -2,14 +2,16 @@
 
 namespace Jojostx\Larasubs\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Jojostx\Larasubs\Enums\IntervalType;
 use Jojostx\Larasubs\Models\Concerns\HandlesRecurrence;
 use Jojostx\Larasubs\Services\Period;
 use Spatie\EloquentSortable\SortableTrait;
-use Spatie\Sluggable\HasTranslatableSlug;
+use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Translatable\HasTranslations;
 
@@ -19,7 +21,7 @@ class Plan extends Model
     use SoftDeletes;
     use HasTranslations;
     use SortableTrait;
-    use HasTranslatableSlug;
+    use HasSlug;
     use HandlesRecurrence;
 
     protected $fillable = [
@@ -55,11 +57,31 @@ class Plan extends Model
         'sort_order' => 'integer',
     ];
 
-    public $translatable = ['name', 'description', 'slug'];
+    public $translatable = ['name', 'description'];
 
     public $sortable = [
         'order_column_name' => 'sort_order',
     ];
+
+    /**
+     * Boot function for using with User Events.
+     *
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($model) {
+            if (!$model->interval) {
+                $model->interval_type = IntervalType::MONTH;
+            }
+
+            if (!$model->interval) {
+                $model->interval = 1;
+            }
+        });
+    }
 
     /**
      * Get the table associated with the model.
@@ -93,6 +115,23 @@ class Plan extends Model
     public function subscriptions()
     {
         return $this->hasMany(config('larasubs.models.subscription'));
+    }
+
+
+    /**
+     * Scope query to return only active plans.
+     */
+    public function scopeWhereActive(Builder $query): Builder
+    {
+        return $query->where('status', true);
+    }
+
+    /**
+     * Scope query to return only inactive plans.
+     */
+    public function scopeWhereNotActive(Builder $query): Builder
+    {
+        return $query->where('status', false);
     }
 
     /**

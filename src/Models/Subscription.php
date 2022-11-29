@@ -12,7 +12,7 @@ use Jojostx\Larasubs\Models\Concerns;
 use Jojostx\Larasubs\Services\Period;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Facades\DB;
-use Spatie\Sluggable\HasTranslatableSlug;
+use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Translatable\HasTranslations;
 
@@ -21,7 +21,7 @@ class Subscription extends Model
     use HasFactory;
     use SoftDeletes;
     use HasTranslations;
-    use HasTranslatableSlug;
+    use HasSlug;
     use Concerns\EndsAndHasGracePeriod;
     use Concerns\HasFeatures;
 
@@ -42,6 +42,7 @@ class Subscription extends Model
     ];
 
     protected $fillable = [
+        'plan_id',
         'name',
         'slug',
         'description',
@@ -70,7 +71,6 @@ class Subscription extends Model
     public $translatable = [
         'name',
         'description',
-        'slug'
     ];
 
     /**
@@ -173,14 +173,14 @@ class Subscription extends Model
     public function scopeWhereActive(Builder $query): Builder
     {
         return $query->where(function (Builder $query) {
-            $query->where(fn (Builder $query) => $query->whereNotEnded())
-                ->where(fn (Builder $query) => $query->whereStarted())
+            $query->where(fn (Builder $query) => $query->whereStarted())
+                ->where(fn (Builder $query) => $query->whereNotEnded())
                 ->where(fn (Builder $query) => $query->whereNotCancelled());
         });
     }
 
     /**
-     * Scope query to return only active subscriptions.
+     * Scope query to return only inactive subscriptions.
      * 
      * (not active means the subscription is overdue
      * or it has not started, or it has been cancelled)
@@ -197,7 +197,7 @@ class Subscription extends Model
      */
     public function scopeWhereStarted(Builder $query): Builder
     {
-        return  $query->where('starts_at', '<', now());
+        return  $query->where('starts_at', '<=', now());
     }
 
     /**
@@ -412,7 +412,7 @@ class Subscription extends Model
      */
     public function start(?Carbon $startDate = null, ?Carbon $endDate = null): bool
     {
-        $startDate = $startDate ?: today();
+        $startDate = $startDate ?: now();
 
         if (empty($endDate) || $startDate->isAfter($endDate)) {
             $this->setNewPeriod(starts_at: $startDate);

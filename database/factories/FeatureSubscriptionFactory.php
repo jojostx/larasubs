@@ -22,14 +22,14 @@ class FeatureSubscriptionFactory extends Factory
             'feature_id'      => Feature::factory(),
             'subscription_id'   => Subscription::factory(),
             'used'     => $this->faker->randomDigitNotNull(),
-            'ends_at'      => $this->faker->dateTime(),
+            'ends_at'      =>  now(),
         ];
     }
 
     public function ended()
     {
         return $this->state(fn (array $attributes) => [
-            'ends_at' => $this->faker->dateTime(),
+            'ends_at' => now(),
         ]);
     }
 

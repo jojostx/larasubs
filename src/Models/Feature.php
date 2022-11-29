@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Jojostx\Larasubs\Models\Concerns\HandlesRecurrence;
 use Spatie\EloquentSortable\SortableTrait;
-use Spatie\Sluggable\HasTranslatableSlug;
+use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Translatable\HasTranslations;
 
@@ -17,7 +17,7 @@ class Feature extends Model
     use HasFactory;
     use SoftDeletes;
     use HasTranslations;
-    use HasTranslatableSlug;
+    use HasSlug;
     use SortableTrait;
     use HandlesRecurrence;
 
@@ -43,7 +43,6 @@ class Feature extends Model
     public $translatable = [
         'name',
         'description',
-        'slug'
     ];
 
     public $sortable = [

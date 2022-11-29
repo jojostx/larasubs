@@ -196,7 +196,7 @@ class SubscriptionTest extends TestCase
 
     $this->assertDatabaseHas('subscriptions', [
       'id' => $subscription->id,
-      'starts_at' => today(),
+      'starts_at' => now(),
     ]);
   }
 
@@ -318,7 +318,7 @@ class SubscriptionTest extends TestCase
     $inactiveSubscriptions = Subscription::factory()
       ->count($inactiveSubscriptionCount = $this->faker()->randomDigitNotNull())
       ->started()
-      ->ended()
+      ->overdue()
       ->notCancelled()
       ->create();
 
@@ -356,7 +356,7 @@ class SubscriptionTest extends TestCase
     );
   }
 
-  public function test_model_returns_ended_subscriptions_on_not_active_scope()
+  public function test_model_returns_overdue_subscriptions_on_not_active_scope()
   {
     Subscription::factory()
       ->count($this->faker()->randomDigitNotNull())
@@ -368,7 +368,7 @@ class SubscriptionTest extends TestCase
     $endedSubscriptions = Subscription::factory()
       ->count($endedSubscriptionCount = $this->faker()->randomDigitNotNull())
       ->started()
-      ->ended()
+      ->overdue()
       ->notCancelled()
       ->create();
 

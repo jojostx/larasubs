@@ -47,8 +47,7 @@ class SubscriptionFactory extends Factory
   public function ended()
   {
     return $this->state(fn (array $attributes) => [
-      'ends_at' => $this->faker->dateTime(),
-      'grace_ends_at' => $this->faker->dateTime(),
+      'ends_at' => now()->subDays(2),
     ]);
   }
 

@@ -113,14 +113,4 @@ class FeatureTest extends TestCase
 
     $this->assertEquals('test-feature', $feature->slug);
   }
-
-  public function test_model_has_translatable_slug()
-  {
-    $feature = Feature::factory()->create(['name' => 'Name in English']);
-    $feature
-      ->setTranslation('name', 'nl', 'Naam in het Nederlands')
-      ->save();
-
-    $this->assertEquals('naam-in-het-nederlands', $feature->getTranslation('slug', 'nl'));
-  }
 }

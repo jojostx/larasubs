@@ -17,32 +17,24 @@ class PlanFactory extends Factory
    */
   public function definition()
   {
+    $interval_type = $this->faker->randomElement([
+      IntervalType::YEAR,
+      IntervalType::MONTH,
+      IntervalType::WEEK,
+      IntervalType::DAY
+    ]);
+
     return [
       'name'             => $this->faker->words(asText: true),
       'active'             => true,
       'price' => 1000,
       'currency' => 'NGN',
       'interval'      => $this->faker->randomDigitNotNull(),
-      'interval_type' => $this->faker->randomElement([
-        IntervalType::YEAR,
-        IntervalType::MONTH,
-        IntervalType::WEEK,
-        IntervalType::DAY
-      ]),
+      'interval_type' => $interval_type,
       'grace_interval'       => $this->faker->randomDigitNotNull(),
-      'grace_interval_type' => $this->faker->randomElement([
-        IntervalType::YEAR,
-        IntervalType::MONTH,
-        IntervalType::WEEK,
-        IntervalType::DAY
-      ]),
+      'grace_interval_type' => $interval_type,
       'trial_interval'       => $this->faker->randomDigitNotNull(),
-      'trial_interval_type' => $this->faker->randomElement([
-        IntervalType::YEAR,
-        IntervalType::MONTH,
-        IntervalType::WEEK,
-        IntervalType::DAY
-      ]),
+      'trial_interval_type' => $interval_type,
     ];
   }
 
@@ -64,9 +56,6 @@ class PlanFactory extends Factory
     return $this->state([
       'trial_interval'       => $this->faker->randomDigitNotNull(),
       'trial_interval_type' => $this->faker->randomElement([
-        IntervalType::YEAR,
-        IntervalType::MONTH,
-        IntervalType::WEEK,
         IntervalType::DAY
       ]),
     ]);

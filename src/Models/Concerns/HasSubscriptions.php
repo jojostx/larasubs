@@ -3,11 +3,14 @@
 namespace Jojostx\Larasubs\Models\Concerns;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Jojostx\Larasubs\Events\SubscriptionCreated;
+use Jojostx\Larasubs\Events\SubscriptionStarted;
+use Jojostx\Larasubs\Events\SubscriptionTrialStarted;
 use Jojostx\Larasubs\Models\Plan;
 use Jojostx\Larasubs\Models\Subscription;
 
@@ -65,7 +68,7 @@ trait HasSubscriptions
   }
 
   /**
-   * Get all plans for inactive subscriptions.
+   * Get all subscriptions with inactive plans.
    */
   public function getPlansForInactiveSubscriptions(): Collection
   {
@@ -75,59 +78,103 @@ trait HasSubscriptions
   }
 
   /**
+   * Get all subscriptions with active plans.
+   * @todo
+   */
+  public function getSubscriptionsWithActivePlan(): Collection
+  {
+    return \collect([]);
+  }
+
+  /**
+   * Get all plans for inactive subscriptions.
+   * @todo
+   */
+  public function getSubscriptionsWithInactivePlan(): Collection
+  {
+    return \collect([]);
+  }
+
+  /**
    * Create a new unsaved subscription to a new plan for the model.
    * @throws InvalidArgumentException
    */
   public function newSubscription(
     Plan $plan,
-    string $name,
+    string $subscriptionName,
     Carbon $starts_at = null,
     Carbon $ends_at = null,
     bool $withoutTrial = false,
     bool $withoutGrace = false,
   ): Subscription {
+
     \throw_if(
       $starts_at && $ends_at && $starts_at->isAfter($ends_at),
       new InvalidArgumentException("The starts_at: [$starts_at] must not be after the ends_at: [$ends_at]")
     );
 
+    $starts_at ??= now();
     $ends_at = $ends_at ?? $plan->calculateNextRecurrenceEnd($starts_at);
 
     if ($plan->hasTrialPeriod() && !$withoutTrial) {
       $trial_ends_at = $plan->calculateTrialPeriodEnd($starts_at);
-      $starts_at = $trial_ends_at;
     }
 
     if ($plan->hasGracePeriod() && !$withoutGrace) {
       $grace_ends_at = $plan->calculateGracePeriodEnd($ends_at);
     }
 
-    return $this->subscriptions()->make([
-      'name' => $name,
+    $subscription = new Subscription([
+      'name' => $subscriptionName,
+      'slug' => Str::slug($subscriptionName),
       'plan_id' => $plan->getKey(),
       'starts_at' =>  $starts_at,
       'ends_at' => $ends_at,
       'trial_ends_at' => $trial_ends_at ?? null,
       'grace_ends_at' => $grace_ends_at ?? null,
     ]);
+
+    return $subscription;
   }
 
   /**
    * Subscribe the model to a plan.
    */
-  public function subscribeTo(Plan $plan, string $name, Carbon $starts_at = null, Carbon $ends_at = null): ?Subscription
-  {
-    try {
-      $subscription = $this->newSubscription(
-        $plan,
-        $name ?? Str::random(12),
-        $starts_at,
-        $ends_at
+  public function subscribeTo(
+    Plan $plan,
+    string $subscriptionName = '',
+    Carbon $starts_at = null,
+    Carbon $ends_at = null,
+    bool $withoutTrial = false,
+    bool $withoutGrace = false,
+  ): ?Subscription {
+    $subscription = $this->newSubscription(
+      $plan,
+      filled($subscriptionName) ? $subscriptionName : Str::random(25),
+      $starts_at,
+      $ends_at,
+      $withoutTrial,
+      $withoutGrace,
+    );
+
+    $saved = $this->subscriptions()->save($subscription);
+
+    if ($saved) {
+      SubscriptionCreated::dispatch($subscription);
+
+      SubscriptionStarted::dispatchIf(
+        ($subscription->starts_at->isCurrentDay() || $subscription->starts_at->isPast()),
+        $subscription
       );
-      return $subscription->save() ? $subscription : null;
-    } catch (\Throwable $th) {
-      return null;
+
+      SubscriptionTrialStarted::dispatchIf(
+        $subscription->onTrial() &&
+          ($subscription->starts_at->isCurrentDay() || $subscription->starts_at->isPast()),
+        $subscription
+      );
     }
+
+    return $saved ? $subscription : null;
   }
 
   /**
@@ -145,9 +192,21 @@ trait HasSubscriptions
    */
   public function hasActiveSubscriptionTo(Plan $plan): bool
   {
-    $subscription = $this->subscriptions()->where('plan_id', $plan->getKey())->first();
+    return $this->subscriptions()
+      ->where('plan_id', $plan->getKey())
+      ->whereActive()
+      ->exists();
+  }
 
-    return $subscription && $subscription->active();
+  /**
+   * Check if the user has inactive subscription to a plan.
+   */
+  public function hasInactiveSubscriptionTo(Plan $plan): bool
+  {
+    return $this->subscriptions()
+      ->where('plan_id', $plan->getKey())
+      ->whereNotActive()
+      ->exists();
   }
 
   /**
