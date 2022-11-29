@@ -11,6 +11,10 @@ class FeaturePlan extends Pivot
         'units',
     ];
 
+    protected $cast = [
+        'units' => 'integer',
+    ];
+
     /**
      * Get the table associated with the model.
      *

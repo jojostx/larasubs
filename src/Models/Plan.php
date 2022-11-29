@@ -2,6 +2,7 @@
 
 namespace Jojostx\Larasubs\Models;
 
+use App\Models\Price;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -44,7 +45,7 @@ class Plan extends Model
     protected $casts = [
         'slug' => 'string',
         'active' => 'boolean',
-        'price' => 'float',
+        'price' => Price::class,
         'currency' => 'string',
         'interval' => 'integer',
         'interval_type' => 'string',
@@ -152,6 +153,6 @@ class Plan extends Model
      */
     public function isFree(): bool
     {
-        return (float) $this->price <= 0.00;
+        return $this->price <= 0;
     }
 }

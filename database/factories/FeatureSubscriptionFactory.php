@@ -21,7 +21,7 @@ class FeatureSubscriptionFactory extends Factory
         return [
             'feature_id'      => Feature::factory(),
             'subscription_id'   => Subscription::factory(),
-            'used'     => $this->faker->randomFloat(),
+            'used'     => $this->faker->randomDigitNotNull(),
             'ends_at'      => $this->faker->dateTime(),
         ];
     }

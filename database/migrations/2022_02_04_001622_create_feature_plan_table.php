@@ -20,7 +20,7 @@ return new class() extends Migration
       $table->foreignIdFor(config('larasubs.models.plan'))
         ->cascadeOnDelete();
 
-      $table->decimal('units')->nullable();
+      $table->integer('units')->nullable();
 
       $table->timestamps();
 

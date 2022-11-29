@@ -11,6 +11,7 @@ use Jojostx\Larasubs\Events\SubscriptionPlanChanged;
 use Jojostx\Larasubs\Events\SubscriptionRenewed;
 use Jojostx\Larasubs\Events\SubscriptionScheduled;
 use Jojostx\Larasubs\Events\SubscriptionStarted;
+use Jojostx\Larasubs\Models\Feature;
 use Jojostx\Larasubs\Models\Plan;
 use Jojostx\Larasubs\Models\Subscription;
 use Jojostx\Larasubs\Tests\Fixtures\Models\User;
@@ -35,6 +36,49 @@ class SubscriptionTest extends TestCase
 
     $subscriptions->each(function ($subscription) use ($plan) {
       $this->assertEquals($plan->getKey(), $subscription->plan->getKey());
+    });
+  }
+
+  public function test_model_can_retrieve_subcriber()
+  {
+    $plan = Plan::factory()
+      ->create();
+
+    $subscriber = User::factory()->create();
+
+    $subscriptions = Subscription::factory()
+      ->count($this->faker->randomDigitNotNull())
+      ->for($plan)
+      ->for($subscriber, 'subscriber')
+      ->create();
+
+    $subscriptions->each(function ($subscription) use ($plan, $subscriber) {
+      $this->assertEquals($plan->getKey(), $subscription->plan->getKey());
+      $this->assertEquals($subscription->subscriber->getKey(), $subscriber->getKey());
+    });
+  }
+
+  public function test_model_can_retrieve_features()
+  {
+    $features = Feature::factory()
+      ->count($featuresCount = $this->faker->randomDigitNotNull())
+      ->create();
+
+    $plan = Plan::factory()
+      ->hasAttached($features)
+      ->create();
+
+    $subscriber = User::factory()->create();
+
+    $subscriptions = Subscription::factory()
+      ->count($this->faker->randomDigitNotNull())
+      ->for($plan)
+      ->for($subscriber, 'subscriber')
+      ->create();
+
+    $subscriptions->each(function ($subscription) use ($featuresCount) {
+      // check if plan features count is equal to the features count for the sub
+      $this->assertEquals($subscription->features->count(), $featuresCount);
     });
   }
 

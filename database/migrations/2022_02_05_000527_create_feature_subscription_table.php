@@ -21,7 +21,7 @@ return new class() extends Migration
             $table->foreignIdFor(config('larasubs.models.subscription'))
                 ->cascadeOnDelete();
 
-            $table->unsignedDecimal('used')->nullable();
+            $table->integer('used')->nullable();
             $table->timestamp('ends_at')->nullable();
             $table->string('timezone')->nullable();
 

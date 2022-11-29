@@ -21,7 +21,7 @@ class FeaturePlanFactory extends Factory
         return [
             'feature_id'      => Feature::factory(),
             'plan_id'     => Plan::factory(),
-            'units' => $this->faker->randomFloat(),
+            'units' => $this->faker->randomDigitNotNull(),
         ];
     }
 }

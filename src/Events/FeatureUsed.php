@@ -16,7 +16,7 @@ class FeatureUsed
     public function __construct(
         public Model $subscriber,
         public Model $feature,
-        public int|float|string $usage
+        public int|string $usage
     ) {
         //
     }

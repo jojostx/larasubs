@@ -20,7 +20,7 @@ class PlanFactory extends Factory
     return [
       'name'             => $this->faker->words(asText: true),
       'active'             => true,
-      'price' => 1000.00,
+      'price' => 1000,
       'currency' => 'NGN',
       'interval'      => $this->faker->randomDigitNotNull(),
       'interval_type' => $this->faker->randomElement([

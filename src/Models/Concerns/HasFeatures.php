@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Jojostx\Larasubs\Events\FeatureUsed;
+use Jojostx\Larasubs\Models\Exceptions\CannotUseFeatureException;
+use Jojostx\Larasubs\Models\Exceptions\FeatureNotFoundException;
 use Jojostx\Larasubs\Models\Feature;
 use Jojostx\Larasubs\Models\FeatureSubscription;
-use OutOfBoundsException;
-use OverflowException;
 
 trait HasFeatures
 {
@@ -18,12 +18,15 @@ trait HasFeatures
    */
   public function usage(): HasMany
   {
-    $model = (config('larasubs.models.subscription'));
-    $model = new $model;
+    $subscription = (config('larasubs.models.subscription'));
+    $subscription = new $subscription;
 
-    return $this->hasMany(config('larasubs.models.feature_subscription'), $model->getForeignKey(), $model->getKeyName());
+    return $this->hasMany(config('larasubs.models.feature_subscription'), $subscription->getForeignKey(), $subscription->getKeyName());
   }
 
+  /**
+   * The features for the subscription.
+   */
   protected function features(): Attribute
   {
     return Attribute::make(
@@ -31,6 +34,9 @@ trait HasFeatures
     )->shouldCache();
   }
 
+  /**
+   * Load the features from the plan for the subscription.
+   */
   protected function loadFeatures(): Collection
   {
     $this->loadMissing('plan.features');
@@ -38,58 +44,54 @@ trait HasFeatures
     return $this->plan->features ?? collect();
   }
 
-  public function canUseFeature(string $featureSlug, ?float $units = null): bool
+  /**
+   * create or return the usage (feature_subscription) for the subscription.
+   */
+  protected function firstOrCreateUsage(Feature|string $feature, int $used = 0): ?FeatureSubscription
   {
-    if (empty($feature = $this->getFeatureBySlug($featureSlug))) {
-      return false;
-    }
+    // check if the feature exists on the features collection
+    // [these are the features available for this Subscription's Plan]
+    $feature = $this->getFeatureBySlug($feature);
 
-    // If the feature is not a consumable type, let's return true
-    if (!$feature->consumable) {
-      return true;
-    }
+    if (is_null($feature)) {
+      return null;
+    };
 
-    $featureUsage = $this->getUsageByFeatureId($feature->getKey());
+    // create or return a record in the Feature_Subscription table (usage) 
+    // for the subcription and for the $feature.
+    $usage = $this->usage()
+      ->firstOrCreate(
+        [
+          'subscription_id' => $this->getKey(),
+          'feature_id' => $feature->getKey(),
+        ],
+        [
+          'used' => $used,
+          'ends_at' => $this->ends_at,
+        ]
+      );
 
-    if (!$featureUsage || $featureUsage->ended()) {
-      return false;
-    }
-
-    // Check for available units
-    $remainingUnits = $this->getRemainingUnitsForFeature($featureSlug);
-
-    return $remainingUnits >= $units;
-  }
-
-  public function cantUseFeature(string $featureSlug, ?float $units = null): bool
-  {
-    return !$this->canUseFeature($featureSlug, $units);
-  }
-
-  public function missingFeature(string $featureSlug): bool
-  {
-    return empty($this->getFeatureBySlug($featureSlug));
-  }
-
-  public function hasFeature(string $featureSlug): bool
-  {
-    return !$this->missingFeature($featureSlug);
+    return $usage;
   }
 
   /**
-   * @throws OutOfBoundsException
-   * @throws OverflowException
+   * use the given **$units** on the usage (feature_subscription) for the subscription
+   * 
+   * @param bool $increments pass false to override the current units on the usage
+   * 
+   * @throws FeatureNotFoundException|CannotUseFeatureException
    */
-  protected function useUnitsOnFeature(string $featureSlug, float $units, bool $incremental = true): ?FeatureSubscription
-  {
+  protected function useUnitsOnFeature(
+    string|Feature $featureSlug,
+    int $units = 0,
+    bool $increments = true
+  ): ?FeatureSubscription {
     $this->validateFeature($featureSlug, $units);
 
     $feature = $this->getFeatureBySlug($featureSlug);
 
     /** @var FeatureSubscription */
-    $featureUsage = $this->getUsageByFeatureId($feature->getKey());
-
-    $featureUsage->feature()->associate($feature);
+    $featureUsage = $this->getUsageByFeatureKey($feature->getKey());
 
     if ($feature->interval_type && $feature->interval) {
       // Set expiration date when the usage record is new or doesn't have one.
@@ -105,63 +107,173 @@ trait HasFeatures
       }
     }
 
-    $featureUsage->used = ($incremental ? $featureUsage->used + $units : $units);
+    $featureUsage->used = ($increments ? $featureUsage->used + $units : $units);
 
-    $featureUsage->save() && event(new FeatureUsed($this, $feature, $units));
+    FeatureUsed::dispatchIf($featureUsage->save(), $this, $feature, $units);
 
     return $featureUsage;
   }
 
   /**
-   * @throws OutOfBoundsException
-   * @throws OverflowException
+   * set the given **$units** on the usage (feature_subscription) for the subscription 
+   *
+   * @throws FeatureNotFoundException|CannotUseFeatureException
    */
-  public function setUsedUnitsOnFeature(string $featureSlug, float $units): ?FeatureSubscription
+  public function setUsedUnitsOnFeature(string|Feature $featureSlug, int $units = 0): ?FeatureSubscription
   {
     return $this->useUnitsOnFeature($featureSlug, $units, false);
   }
 
-  public function getRemainingUnitsForFeature(string $featureSlug): float
+  /**
+   * get the remaining units for the feature usage
+   */
+  public function getRemainingUnitsForFeature(string|Feature $featureSlug): int
   {
     return $this->getMaxFeatureUnits($featureSlug) - $this->getFeatureUnitsUsed($featureSlug);
   }
 
-  public function getMaxFeatureUnits(string $featureSlug): float
+  /**
+   * get the maximum units that can be used on a feature
+   */
+  public function getMaxFeatureUnits(string|Feature $featureSlug): int
   {
+    $featureSlug = $this->getFeatureSlug($featureSlug);
+
     $feature = $this->plan->features()->where('slug', $featureSlug)->first();
 
     return $feature->pivot->units ?? 0;
   }
 
-  public function getFeatureUnitsUsed(string $featureSlug): float
+  /**
+   * get the units that have been used on a feature
+   */
+  public function getFeatureUnitsUsed(string|Feature $featureSlug): int
   {
+    $featureSlug = $this->getFeatureSlug($featureSlug);
+
     $usage = $this->usage()->whereFeatureSlug($featureSlug)->first();
 
     return (is_null($usage) || $usage->ended()) ? 0 : $usage->used;
   }
 
-  public function getFeatureBySlug(string $featureSlug): ?Feature
+  /**
+   * get a feature from the features collection
+   */
+  public function getFeatureBySlug(string|Feature $featureSlug): ?Feature
   {
+    $featureSlug = $this->getFeatureSlug($featureSlug);
+
     $feature = $this->features->firstWhere('slug', $featureSlug);
 
     return $feature;
   }
 
-  public function getUsageByFeatureId(string $feature_id): ?FeatureSubscription
+  /**
+   * get the usage for a feature,
+   * 
+   * - If the feature is a valid feature, this method returns
+   * an existing usage for the $featureKey or a newly created
+   * usage with **used** units set to zero if no usage is found.
+   */
+  public function getUsageByFeatureKey(string|Feature $featureKey): ?FeatureSubscription
   {
-    return $this->usage()
-      ->where('feature_id', $feature_id)
-      ->firstOrNew();
+    return $this->firstOrCreateUsage($featureKey);
   }
 
-  public function validateFeature(string $featureSlug, float $units)
+  /**
+   * gets the slug for a feature.
+   */
+  protected function getFeatureSlug(string|Feature $featureSlug): string
   {
-    throw_if($this->missingFeature($featureSlug), new OutOfBoundsException(
-      'None of the active plans grants access to this feature.',
-    ));
+    return \is_string($featureSlug) ? $featureSlug : $featureSlug->slug;
+  }
 
-    throw_if($this->cantUseFeature($featureSlug, $units), new OverflowException(
-      'The feature does not have enough units.',
-    ));
+  /**
+   * gets the value of the primary key for a feature.
+   */
+  protected function getFeatureKey(int|string|Feature $featureKey): string
+  {
+    return (\is_string($featureKey) || is_int($featureKey)) ? $featureKey : $featureKey->getKey();
+  }
+
+  /**
+   * throws an exception if the feature is not available on the subscriptions Plan
+   * @throws FeatureNotFoundException
+   */
+  public function throwIfMissingFeature(Feature $feature)
+  {
+    throw_if($this->missingFeature($feature), new FeatureNotFoundException($feature));
+  }
+
+  /**
+   * throws an exception if the subscription cannot use the feature
+   * @throws CannotUseFeatureException
+   */
+  public function throwIfCannotUseFeature(Feature $feature, int $units = 0)
+  {
+    throw_if($this->cannotUseFeature($feature, $units), new CannotUseFeatureException($feature, $units));
+  }
+
+  /**
+   * throws an exception if the subscription cannot use the feature or 
+   * the feature is not available on the subscriptions Plan
+   * 
+   * @throws FeatureNotFoundException|CannotUseFeatureException
+   */
+  public function validateFeature(Feature $feature, int $units)
+  {
+    $this->throwIfMissingFeature($feature);
+
+    $this->throwIfCannotUseFeature($feature, $units);
+  }
+
+  /**
+   * checks if a feature can be used for the subscription
+   */
+  public function canUseFeature(string|Feature $featureSlug, ?int $units = null): bool
+  {
+    if (empty($feature = $this->getFeatureBySlug($featureSlug))) {
+      return false;
+    }
+
+    // If the feature is not a consumable type, let's return true
+    if (!$feature->consumable) {
+      return true;
+    }
+
+    $featureUsage = $this->getUsageByFeatureKey($feature->getKey());
+
+    if (!$featureUsage || $featureUsage->ended()) {
+      return false;
+    }
+
+    // Check for available units
+    $remainingUnits = $this->getRemainingUnitsForFeature($featureSlug);
+
+    return $remainingUnits >= (int) $units;
+  }
+
+  /**
+   * checks if a feature can not be used for the subscription
+   */
+  public function cannotUseFeature(string|Feature $featureSlug, ?int $units = null): bool
+  {
+    return !$this->canUseFeature($featureSlug, $units);
+  }
+
+  /**
+   * checks if a feature is available for the subscription
+   */
+  public function hasFeature(string|Feature $featureSlug): bool
+  {
+    return !$this->missingFeature($featureSlug);
+  }
+
+  /**
+   * checks if a feature is not available for the subscription
+   */
+  public function missingFeature(string|Feature $featureSlug): bool
+  {
+    return empty($this->getFeatureBySlug($featureSlug));
   }
 }

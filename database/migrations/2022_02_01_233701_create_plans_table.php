@@ -19,7 +19,7 @@ return new class extends Migration
       $table->json('description')->nullable();
 
       $table->boolean('active')->default(true);
-      $table->decimal('price', 9, 2)->default('0.00');
+      $table->{config('larasubs.plan.price_column_type')}('price')->default('0');
       $table->string('currency', 3);
 
       $table->unsignedInteger('interval')->default(1);
