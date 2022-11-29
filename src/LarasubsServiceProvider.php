@@ -8,11 +8,58 @@ use Illuminate\Support\ServiceProvider;
 class LarasubsServiceProvider extends ServiceProvider
 {
   /**
-   * Perform post-registration booting of services.
+   * Register any application services.
+   *
+   * @return void
+   */
+  public function register()
+  {
+    $this->configure();
+  }
+
+  /**
+   * Setup the configuration for Cashier.
+   *
+   * @return void
+   */
+  protected function configure()
+  {
+    $this->mergeConfigFrom(
+      __DIR__ . '/../config/larasubs.php',
+      'larasubs'
+    );
+  }
+
+  /**
+   * Bootstrap any package services.
    *
    * @return void
    */
   public function boot()
+  {
+    $this->bootMigrations();
+    $this->bootValidtions();
+    $this->bootPublishing();
+  }
+
+  /**
+   * Boot the package migrations.
+   *
+   * @return void
+   */
+  protected function bootMigrations()
+  {
+    if (!config('larasubs.database.cancel_migrations_autoloading') && $this->app->runningInConsole()) {
+      $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+    }
+  }
+
+  /**
+   * Boot the package migrations.
+   *
+   * @return void
+   */
+  protected function bootValidtions()
   {
     // Add strip_tags validation rule
     Validator::extend('strip_tags', function ($attribute, $value) {
@@ -26,11 +73,20 @@ class LarasubsServiceProvider extends ServiceProvider
   }
 
   /**
-   * Register any package services.
+   * Boot the package's publishable resources.
    *
    * @return void
    */
-  public function register()
+  protected function bootPublishing()
   {
+    if ($this->app->runningInConsole()) {
+      $this->publishes([
+        __DIR__ . '/../config/larasubs.php' => config_path('larasubs.php'),
+      ], 'larasubs-config');
+
+      $this->publishes([
+        __DIR__ . '/../database/migrations' => database_path('migrations'),
+      ], 'larasubs-migrations');
+    }
   }
 }

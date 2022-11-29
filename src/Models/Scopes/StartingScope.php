@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Scope;
 class StartingScope implements Scope
 {
     protected $extensions = [
-        'OnlyNotStarted',
+        'WhereNotStarted',
         'WithNotStarted',
         'WithoutNotStarted',
     ];
@@ -46,9 +46,9 @@ class StartingScope implements Scope
         });
     }
 
-    protected function addOnlyNotStarted(Builder $builder)
+    protected function addWhereNotStarted(Builder $builder)
     {
-        $builder->macro('onlyNotStarted', function (Builder $builder) {
+        $builder->macro('whereNotStarted', function (Builder $builder) {
             $builder->withoutGlobalScope($this)->where('starts_at', '>', now());
 
             return $builder;

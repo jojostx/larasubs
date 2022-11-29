@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Jojostx\Larasubs\Services;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Carbon\Exceptions\InvalidFormatException;
 use InvalidArgumentException;
 
@@ -20,7 +20,7 @@ class Period
   /**
    * Ending date of the period.
    */
-  protected string|Carbon $end;
+  protected string|Carbon $ends_at;
 
   /**
    * Interval Type [day|week|month|year].
@@ -39,7 +39,7 @@ class Period
   public function __construct(
     string $interval_type = 'month',
     int $count = 1,
-    string|Carbon $starts_at = ''
+    string|Carbon|null $starts_at = ''
   ) {
     throw_if(
       !in_array($interval_type, self::VALID_INTERVAL_TYPES),
@@ -62,7 +62,7 @@ class Period
 
     $method = 'add' . ucfirst($this->interval_type) . 's';
 
-    $this->end = $starts_at->{$method}($this->period);
+    $this->ends_at = $starts_at->{$method}($this->period);
   }
 
   /**
@@ -78,7 +78,7 @@ class Period
    */
   public function getEndDate(): Carbon
   {
-    return $this->end;
+    return $this->ends_at;
   }
 
   /**

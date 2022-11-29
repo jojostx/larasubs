@@ -16,7 +16,7 @@ class CancellingScope implements Scope
 
     public function apply(Builder $builder, Model $model)
     {
-        $builder->whereNull('cancelled_at');
+        $builder->whereNull('cancels_at');
     }
 
     public function extend(Builder $builder)
@@ -40,7 +40,7 @@ class CancellingScope implements Scope
     protected function addWithoutCancelled(Builder $builder)
     {
         $builder->macro('withoutCancelled', function (Builder $builder) {
-            $builder->withoutGlobalScope($this)->whereNull('cancelled_at');
+            $builder->withoutGlobalScope($this)->whereNull('cancels_at');
 
             return $builder;
         });
@@ -49,7 +49,7 @@ class CancellingScope implements Scope
     protected function addOnlyCancelled(Builder $builder)
     {
         $builder->macro('onlyCancelled', function (Builder $builder) {
-            $builder->withoutGlobalScope($this)->whereNotNull('cancelled_at');
+            $builder->withoutGlobalScope($this)->whereNotNull('cancels_at');
 
             return $builder;
         });

@@ -2,7 +2,7 @@
 
 namespace Jojostx\Larasubs\Models\Concerns;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -108,7 +108,7 @@ trait HasSubscriptions
       'starts_at' =>  $starts_at,
       'ends_at' => $ends_at,
       'trial_ends_at' => $trial_ends_at ?? null,
-      'grace_period_ends_at' => $grace_ends_at ?? null,
+      'grace_ends_at' => $grace_ends_at ?? null,
     ]);
   }
 

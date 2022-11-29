@@ -12,7 +12,6 @@ use Jojostx\Larasubs\Models\Concerns\Ends;
 class FeatureSubscription extends Model
 {
     use SoftDeletes;
-    use Ends;
 
     /**
      * {@inheritdoc}
@@ -82,9 +81,28 @@ class FeatureSubscription extends Model
 
         return $builder->where('feature_id', $feature->getKey() ?? null);
     }
+    /**
+     * Find ended subscriptions.
+     */
+
+    public function scopeWhereEnded(Builder $query): Builder
+    {
+        $date = Carbon::now();
+
+        return $query
+            ->where('ends_at', '<', $date);
+    }
+
+    public function scopeWhereNotEnded(Builder $query): Builder
+    {
+        $date = Carbon::now();
+
+        return $query
+            ->where('ends_at', '>', $date);
+    }
 
     /**
-     * Check whether usage has been ended or not.
+     * Check whether usage has ended.
      *
      * @return bool
      */
@@ -95,5 +113,15 @@ class FeatureSubscription extends Model
         }
 
         return Carbon::now()->gte($this->ends_at);
+    }
+
+    /**
+     * Check whether usage has not ended.
+     *
+     * @return bool
+     */
+    public function notEnded(): bool
+    {
+        return !$this->ended();
     }
 }

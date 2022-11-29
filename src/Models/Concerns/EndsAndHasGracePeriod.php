@@ -6,30 +6,30 @@ use Jojostx\Larasubs\Models\Scopes\EndsWithGracePeriodScope;
 
 trait EndsAndHasGracePeriod
 {
-    public static function bootExpiresAndHasGracePeriod()
+    public static function bootEndsWithGracePeriod()
     {
         static::addGlobalScope(new EndsWithGracePeriodScope());
     }
 
-    public function initializeExpiresAndHasGracePeriod()
+    public function initializeEndsWithGracePeriod()
     {
         if (! isset($this->casts['ends_at'])) {
             $this->casts['ends_at'] = 'datetime';
         }
 
-        if (! isset($this->casts['grace_period_ends_at'])) {
-            $this->casts['grace_period_ends_at'] = 'datetime';
+        if (! isset($this->casts['grace_ends_at'])) {
+            $this->casts['grace_ends_at'] = 'datetime';
         }
     }
 
     public function ended()
     {
-        if (is_null($this->grace_period_ends_at)) {
+        if (is_null($this->grace_ends_at)) {
             return $this->ends_at->isPast();
         }
 
         return $this->ends_at->isPast()
-            && $this->grace_period_ends_at->isPast();
+            && $this->grace_ends_at->isPast();
     }
 
     public function notEnded()

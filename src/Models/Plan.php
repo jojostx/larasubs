@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Jojostx\Larasubs\Models\Concerns\HandlesRecurrence;
 use Jojostx\Larasubs\Services\Period;
+use Spatie\EloquentSortable\SortableTrait;
+use Spatie\Sluggable\HasTranslatableSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Translatable\HasTranslations;
 
@@ -16,8 +18,9 @@ class Plan extends Model
     use HasFactory;
     use SoftDeletes;
     use HasTranslations;
+    use SortableTrait;
+    use HasTranslatableSlug;
     use HandlesRecurrence;
-    use Concerns\HasSlug;
 
     protected $fillable = [
         'name',
@@ -74,7 +77,6 @@ class Plan extends Model
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
-            ->doNotGenerateSlugsOnUpdate()
             ->generateSlugsFrom('name')
             ->saveSlugsTo('slug');
     }
@@ -84,6 +86,7 @@ class Plan extends Model
         $pivot_table = config('larasubs.tables.feature_plan');
 
         return $this->belongsToMany(config('larasubs.models.feature'), $pivot_table)
+            ->using(config('larasubs.models.feature_plan'))
             ->withPivot('units');
     }
 
@@ -100,14 +103,14 @@ class Plan extends Model
         return $this->features()->where('slug', $featureSlug)->first();
     }
 
-    public function calculateGracePeriodEnd(Carbon $recurrenceStart)
+    public function calculateGracePeriodEnd(?Carbon $graceStart = null)
     {
-        $period = new Period($this->grace_interval_type, $this->grace_interval, $recurrenceStart);
+        $period = new Period($this->grace_interval_type, $this->grace_interval, $graceStart);
 
         return $period->getEndDate();
     }
 
-    public function calculateTrialPeriodEnd(Carbon $trialStart)
+    public function calculateTrialPeriodEnd(?Carbon $trialStart = null)
     {
         $period = new Period($this->trial_interval_type, $this->trial_interval, $trialStart);
 

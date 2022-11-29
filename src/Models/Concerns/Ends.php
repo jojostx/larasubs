@@ -6,12 +6,12 @@ use Jojostx\Larasubs\Models\Scopes\EndingScope;
 
 trait Ends
 {
-    public static function bootEnds()
+    public static function bootEnding()
     {
         static::addGlobalScope(new EndingScope());
     }
 
-    public function initializeEnds()
+    public function initializeEnding()
     {
         if (! isset($this->casts['ends_at'])) {
             $this->casts['ends_at'] = 'datetime';

@@ -2,10 +2,25 @@
 
 namespace Jojostx\Larasubs\Enums;
 
-enum IntervalType: string
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
+
+class IntervalType
 {
-  case YEAR = 'year';
-  case MONTH = 'month';
-  case WEEK = 'week';
-  case DAY = 'day';
+    public const YEAR = 'year';
+
+    public const MONTH = 'month';
+
+    public const WEEK = 'week';
+
+    public const DAY = 'day';
+
+    public static function getDateDifference(Carbon $from, Carbon $to, string $unit): int
+    {
+        $unitInPlural = Str::plural($unit);
+
+        $differenceMethodName = 'diffIn' . $unitInPlural;
+
+        return $from->{$differenceMethodName}($to);
+    }
 }

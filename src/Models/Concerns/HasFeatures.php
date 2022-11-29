@@ -130,7 +130,7 @@ trait HasFeatures
   {
     $feature = $this->plan->features()->where('slug', $featureSlug)->first();
 
-    return $feature->units ?? 0;
+    return $feature->pivot->units ?? 0;
   }
 
   public function getFeatureUnitsUsed(string $featureSlug): float

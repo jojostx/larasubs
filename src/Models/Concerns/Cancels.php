@@ -6,25 +6,25 @@ use Jojostx\Larasubs\Models\Scopes\CancellingScope;
 
 trait Cancels
 {
-    public static function bootCancels()
+    public static function bootCancelling()
     {
         static::addGlobalScope(new CancellingScope());
     }
 
-    public function initializeCancels()
+    public function initializeCancelling()
     {
-        if (! isset($this->casts['cancelled_at'])) {
-            $this->casts['cancelled_at'] = 'datetime';
+        if (! isset($this->casts['cancels_at'])) {
+            $this->casts['cancels_at'] = 'datetime';
         }
     }
 
     public function cancelled()
     {
-        if (empty($this->cancelled_at)) {
+        if (empty($this->cancels_at)) {
             return false;
         }
 
-        return $this->cancelled_at->isPast();
+        return $this->cancels_at->isPast();
     }
 
     public function notCancelled()

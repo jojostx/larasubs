@@ -15,6 +15,7 @@ class SubscriptionCancelled
 
   public function __construct(
       public Model $subscription,
+      public bool $wasCancelledImmediately
   ) {
       //
   }

@@ -18,16 +18,15 @@ return new class extends Migration
         ->cascadeOnDelete()
         ->cascadeOnUpdate();
 
-      $table->string('slug')->unique();
       $table->json('name');
+      $table->string('slug')->unique();
       $table->json('description')->nullable();
 
-      $table->timestamp('grace_period_ends_at')->nullable();
+      $table->timestamp('grace_ends_at')->nullable();
       $table->timestamp('trial_ends_at')->nullable();
       $table->timestamp('starts_at')->nullable();
       $table->timestamp('ends_at')->nullable();
       $table->timestamp('cancels_at')->nullable();
-      $table->timestamp('cancelled_at')->nullable();
       $table->string('timezone')->nullable();
 
       $table->unsignedInteger('sort_order')->default(0);
