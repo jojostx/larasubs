@@ -22,12 +22,12 @@ class CannotUseFeatureException extends RuntimeException
    */
   protected $units;
 
-  public function __construct(Feature $feature, int $units, int $code = 0, Throwable|null $previous = null)
+  public function __construct($message = 'The feature cannot be used', Feature $feature, int $units, int $code = 0, Throwable|null $previous = null)
   {
     $this->feature = $feature;
     $this->units = $units;
 
-    parent::__construct('The feature does not have enough units or the feature has ended', $code, $previous);
+    parent::__construct($message, $code, $previous);
   }
 
   /**

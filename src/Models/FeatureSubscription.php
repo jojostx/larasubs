@@ -3,6 +3,7 @@
 namespace Jojostx\Larasubs\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class FeatureSubscription extends Model
 {
+    use HasFactory;
     use SoftDeletes;
 
     /**
@@ -18,6 +20,7 @@ class FeatureSubscription extends Model
     protected $fillable = [
         'subscription_id',
         'feature_id',
+        'active',
         'used',
         'ends_at',
         'timezone'
@@ -50,7 +53,7 @@ class FeatureSubscription extends Model
      */
     public function feature(): BelongsTo
     {
-        return $this->belongsTo(config('larasubs.models.features'));
+        return $this->belongsTo(config('larasubs.models.feature'));
     }
 
     /**
@@ -98,6 +101,42 @@ class FeatureSubscription extends Model
 
         return $query
             ->where('ends_at', '>', $date);
+    }
+
+    /**
+     * Scope query to return only active models.
+     */
+    public function scopeWhereActive(Builder $query): Builder
+    {
+        return $query->where('status', true);
+    }
+
+    /**
+     * Scope query to return only inactive models.
+     */
+    public function scopeWhereNotActive(Builder $query): Builder
+    {
+        return $query->where('status', false);
+    }
+
+    public function activate(): bool
+    {
+        return $this->update(['active' => true]);
+    }
+
+    public function deactivate(): bool
+    {
+        return $this->update(['active' => false]);
+    }
+
+    public function isActive(): bool
+    {
+        return (bool) $this->active;
+    }
+
+    public function isInactive(): bool
+    {
+        return !$this->isActive();
     }
 
     /**

@@ -20,6 +20,7 @@ class FeatureFactory extends Factory
     return [
       'name'             => $this->faker->words(asText: true),
       'consumable'       => $this->faker->boolean(),
+      'active'       => true,
       'interval'      => $this->faker->randomDigitNotNull(),
       'interval_type' => $this->faker->randomElement([
         IntervalType::YEAR,
@@ -28,6 +29,20 @@ class FeatureFactory extends Factory
         IntervalType::DAY
       ]),
     ];
+  }
+
+  public function active()
+  {
+    return $this->state([
+      'active'       => true,
+    ]);
+  }
+
+  public function inactive()
+  {
+    return $this->state([
+      'active'       => false,
+    ]);
   }
 
   public function consumable()

@@ -21,9 +21,24 @@ class FeatureSubscriptionFactory extends Factory
         return [
             'feature_id'      => Feature::factory(),
             'subscription_id'   => Subscription::factory(),
+            'active'       => true,
             'used'     => $this->faker->randomDigitNotNull(),
             'ends_at'      =>  now(),
         ];
+    }
+
+    public function active()
+    {
+      return $this->state([
+        'active'       => true,
+      ]);
+    }
+  
+    public function inactive()
+    {
+      return $this->state([
+        'active'       => false,
+      ]);
     }
 
     public function ended()

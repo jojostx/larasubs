@@ -19,11 +19,9 @@ return new class() extends Migration
       $table->string('slug')->unique();
       $table->json('name');
       $table->json('description')->nullable();
-
       $table->boolean('consumable')->default(false);
-
+      $table->boolean('active')->default(true);
       $table->unsignedInteger('sort_order')->default(0);
-
       $table->unsignedInteger('interval')->default(1);
       $table->string('interval_type')->default(IntervalType::MONTH);
 

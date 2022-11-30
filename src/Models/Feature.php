@@ -2,6 +2,7 @@
 
 namespace Jojostx\Larasubs\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -26,6 +27,7 @@ class Feature extends Model
         'slug',
         'description',
         'consumable',
+        'active',
         'interval',
         'interval_type',
         'sort_order',
@@ -37,6 +39,7 @@ class Feature extends Model
     protected $casts = [
         'slug' => 'string',
         'consumable' => 'boolean',
+        'active' => 'boolean',
         'sort_order' => 'integer',
     ];
 
@@ -78,5 +81,41 @@ class Feature extends Model
 
         return $this->belongsToMany(config('larasubs.models.plan'), $pivot_table)
             ->withPivot('units');
+    }
+
+    /**
+     * Scope query to return only active plans.
+     */
+    public function scopeWhereActive(Builder $query): Builder
+    {
+        return $query->where('status', true);
+    }
+
+    /**
+     * Scope query to return only inactive plans.
+     */
+    public function scopeWhereNotActive(Builder $query): Builder
+    {
+        return $query->where('status', false);
+    }
+
+    public function activate(): bool
+    {
+        return $this->update(['active' => true]);
+    }
+
+    public function deactivate(): bool
+    {
+        return $this->update(['active' => false]);
+    }
+
+    public function isActive(): bool
+    {
+        return (bool) $this->active;
+    }
+
+    public function isInactive(): bool
+    {
+        return !$this->isActive();
     }
 }
