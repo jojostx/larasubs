@@ -32,6 +32,7 @@ class FeatureSubscription extends Model
     protected $casts = [
         'subscription_id' => 'integer',
         'feature_id' => 'integer',
+        'active' => 'boolean',
         'used' => 'integer',
         'ends_at' => 'datetime',
     ];
@@ -108,7 +109,7 @@ class FeatureSubscription extends Model
      */
     public function scopeWhereActive(Builder $query): Builder
     {
-        return $query->where('status', true);
+        return $query->where('active', true);
     }
 
     /**
@@ -116,7 +117,7 @@ class FeatureSubscription extends Model
      */
     public function scopeWhereNotActive(Builder $query): Builder
     {
-        return $query->where('status', false);
+        return $query->where('active', false);
     }
 
     public function activate(): bool

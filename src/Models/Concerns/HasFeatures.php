@@ -75,6 +75,18 @@ trait HasFeatures
   }
 
   /**
+   * get the usage for a feature,
+   * 
+   * - If the feature is a valid feature, this method returns
+   * an existing usage for the $featureKey or a newly created
+   * usage with **used** units set to zero if no usage is found.
+   */
+  protected function getUsageByFeature(Feature $feature): ?FeatureSubscription
+  {
+    return $this->firstOrCreateUsage($feature);
+  }
+
+  /**
    * create or return the usage (feature_subscription) for the subscription.
    * usage can not be created for inactive features.
    */
@@ -97,12 +109,13 @@ trait HasFeatures
           'feature_id' => $feature->getKey(),
         ],
         [
+          'active' => true,
           'used' => $used,
           'ends_at' => $this->ends_at,
         ]
       );
 
-    return $usage;
+    return $usage->refresh();
   }
 
   /**
@@ -209,7 +222,7 @@ trait HasFeatures
    */
   public function getRemainingUnitsForFeature(string|Feature $featureSlug): int
   {
-    return $this->getMaxFeatureUnits($featureSlug) - $this->getFeatureUnitsUsed($featureSlug);
+    return $this->getMaxFeatureUnits($featureSlug) - $this->getUnitsUsedForFeature($featureSlug);
   }
 
   /**
@@ -227,7 +240,7 @@ trait HasFeatures
   /**
    * get the units that have been used on a feature
    */
-  public function getFeatureUnitsUsed(string|Feature $featureSlug): int
+  public function getUnitsUsedForFeature(string|Feature $featureSlug): int
   {
     $featureSlug = $this->getFeatureSlug($featureSlug);
 
@@ -237,29 +250,15 @@ trait HasFeatures
   }
 
   /**
-   * get the usage for a feature,
-   * 
-   * - If the feature is a valid feature, this method returns
-   * an existing usage for the $featureKey or a newly created
-   * usage with **used** units set to zero if no usage is found.
-   */
-  public function getUsageByFeature(Feature $feature): ?FeatureSubscription
-  {
-    return $this->firstOrCreateUsage($feature);
-  }
-  
-  /**
    * use the given **$units** on the usage (feature_subscription) for the subscription
    * 
    * @param bool $increments pass false to override the current units on the usage
    * 
    * @throws FeatureNotFoundException|CannotUseFeatureException
    */
-  public function useUnitsOnFeature(string|Feature $featureSlug, int $units = 0, bool $increments = true): ?FeatureSubscription
+  public function useUnitsOnFeature(Feature $feature, int $units = 0, bool $increments = true): ?FeatureSubscription
   {
-    $this->validateFeature($featureSlug, $units);
-
-    $feature = $this->getFeatureBySlug($featureSlug);
+    $this->validateFeature($feature, $units);
 
     /** @var FeatureSubscription */
     $featureUsage = $this->getUsageByFeature($feature);
@@ -292,8 +291,34 @@ trait HasFeatures
    *
    * @throws FeatureNotFoundException|CannotUseFeatureException
    */
-  public function setUsedUnitsOnFeature(string|Feature $featureSlug, int $units = 0): ?FeatureSubscription
+  public function setUsedUnitsOnFeature(Feature $feature, int $units = 0): ?FeatureSubscription
   {
-    return $this->useUnitsOnFeature($featureSlug, $units, false);
+    return $this->useUnitsOnFeature($feature, $units, false);
+  }
+
+  /**
+   * activate a feature for this model
+   * - this activates the usage (feature_subscription) 
+   */
+  public function activateFeature(string|Feature $featureSlug): bool
+  {
+    if ($usage = $this->firstOrCreateUsage($featureSlug)) {
+      return $usage->activate();
+    }
+
+    return false;
+  }
+
+  /**
+   * deactivate a feature for this model
+   * - this deactivates the usage (feature_subscription) 
+   */
+  public function deactivateFeature(string|Feature $featureSlug): bool
+  {
+    if ($usage = $this->firstOrCreateUsage($featureSlug)) {
+      return $usage->deactivate();
+    }
+
+    return false;
   }
 }

@@ -22,8 +22,13 @@ class CannotUseFeatureException extends RuntimeException
    */
   protected $units;
 
-  public function __construct($message = 'The feature cannot be used', Feature $feature, int $units, int $code = 0, Throwable|null $previous = null)
-  {
+  public function __construct(
+    $message = 'The feature cannot be used',
+    Feature $feature,
+    int $units,
+    int $code = 0,
+    Throwable|null $previous = null
+  ) {
     $this->feature = $feature;
     $this->units = $units;
 

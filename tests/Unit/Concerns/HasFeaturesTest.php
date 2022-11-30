@@ -6,6 +6,9 @@ use LucasDotVin\DBQueriesCounter\Traits\CountsQueries;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Event;
+use Jojostx\Larasubs\Events\FeatureUsed;
+use Jojostx\Larasubs\Models\Exceptions\CannotUseFeatureException;
+use Jojostx\Larasubs\Models\Exceptions\FeatureNotFoundException;
 use Jojostx\Larasubs\Models\Feature;
 use Jojostx\Larasubs\Models\FeatureSubscription;
 use Jojostx\Larasubs\Models\Plan;
@@ -38,7 +41,7 @@ class HasFeaturesTest extends TestCase
     $this->assertTrue($subscription->usage->contains($featureSubscriptionPivot));
   }
 
-  public function testModelCachesFeatures()
+  public function test_model_caches_features()
   {
     $units = $this->faker->numberBetween(5, 10);
 
@@ -60,9 +63,10 @@ class HasFeaturesTest extends TestCase
     $this->assertEquals($initiallyPerformedQueries, $totalPerformedQueries);
   }
 
-  public function testModelCanRetrieveFeatureBySlug()
+  public function test_model_can_use_a_feature()
   {
     $units = $this->faker->numberBetween(5, 10);
+    $usage = $this->faker->numberBetween(1, $units);
 
     $plan = Plan::factory()->createOne();
     $feature = Feature::factory()->consumable()->createOne();
@@ -73,340 +77,232 @@ class HasFeaturesTest extends TestCase
     $subscriber = User::factory()->createOne();
     $subscription = $subscriber->subscribeTo($plan);
 
-    $returned_feature = $subscription->getFeatureBySlug($feature);
+    Event::fake();
 
-    $this->assertEquals($returned_feature->getKey(), $feature->getKey());
-  }
+    $subscription->useUnitsOnFeature($feature, $usage);
 
-  public function testModelCanRetrieveFeatureById()
-  {
-    $units = $this->faker->numberBetween(5, 10);
-
-    $plan = Plan::factory()->createOne();
-    $feature = Feature::factory()->consumable()->createOne();
-    $feature->plans()->attach($plan, [
-      'units' => $units,
-    ]);
-
-    $subscriber = User::factory()->createOne();
-    $subscription = $subscriber->subscribeTo($plan);
-
-    $returned_feature = $subscription->getFeatureById($feature->getKey());
-
-    $this->assertEquals($returned_feature->getKey(), $feature->getKey());
-  }
-
-  // public function testModelCanGetUsageByFeature()
-  // {
-  //   $units = $this->faker->numberBetween(5, 10);
-  //   $usage = $this->faker->numberBetween(1, $units);
-
-  //   $plan = Plan::factory()->createOne();
-  //   $feature = Feature::factory()->consumable()->createOne();
-  //   $feature->plans()->attach($plan, [
-  //     'units' => $units,
-  //   ]);
-
-  //   $subscriber = User::factory()->createOne();
-  //   $subscription = $subscriber->subscribeTo($plan);
-
-  //   $subscription->firstOrCreateUsage($feature, $usage);
-
-  //   $this->assertDatabaseHas('feature_usages', [
-  //     'feature_id' => $feature->id,
-  //     'subscription_id' => $subscription->id,
-  //     'used' => $usage,
-  //     'ends_at' => $feature->calculateNextRecurrenceEnd($subscription->starts_at),
-  //   ]);
-  // }
-
-  public function testModelCanRetrieveOrCreateUsage()
-  {
-    $units = $this->faker->numberBetween(5, 10);
-
-    $plan = Plan::factory()->createOne();
-    $feature = Feature::factory()->consumable()->createOne();
-    $feature->plans()->attach($plan, [
-      'units' => $units,
-    ]);
-
-    $subscriber = User::factory()->createOne();
-    $subscription = $subscriber->subscribeTo($plan);
-
-    $f_subscription = $subscription->getUsageByFeature($feature);
+    Event::assertDispatched(FeatureUsed::class);
 
     $this->assertDatabaseHas('feature_subscription', [
       'feature_id' => $feature->id,
       'subscription_id' => $subscription->id,
-      'used' => 0,
-      'ends_at' => $subscription->ends_at,
-    ]);
-
-    $this->assertDatabaseHas('feature_subscription', [
-      'feature_id' => $f_subscription->feature->id,
-      'subscription_id' => $f_subscription->subscription->id,
-      'used' => $f_subscription->used,
-      'ends_at' => $subscription->ends_at,
+      'used' => $usage,
+      'active' => true,
+      'ends_at' => $feature->calculateNextRecurrenceEnd($subscription->starts_at),
     ]);
   }
 
-  // public function testModelCanUseAFeature()
-  // {
-  //   $units = $this->faker->numberBetween(5, 10);
-  //   $usage = $this->faker->numberBetween(1, $units);
+  public function test_model_cant_use_an_inactive_feature()
+  {
+    $units = $this->faker->numberBetween(5, 10);
+    $usage = $this->faker->numberBetween(1, $units);
 
-  //   $plan = Plan::factory()->createOne();
-  //   $feature = Feature::factory()->consumable()->createOne();
-  //   $feature->plans()->attach($plan, [
-  //     'units' => $units,
-  //   ]);
+    $plan = Plan::factory()->createOne();
+    $feature = Feature::factory()->inactive()->createOne();
 
-  //   $subscriber = User::factory()->createOne();
-  //   $subscription = $subscriber->subscribeTo($plan);
+    $feature->plans()->attach($plan, [
+      'units' => $units,
+    ]);
 
-  //   Event::fake();
+    $subscriber = User::factory()->createOne();
+    $subscription = $subscriber->subscribeTo($plan);
 
-  //   $subscription->useUnitsOnFeature($feature, $usage);
+    Event::fake();
 
-  //   Event::assertDispatched(FeatureUsed::class);
+    $this->expectException(CannotUseFeatureException::class);
+    $this->expectExceptionMessage('This feature is inactive for this plan: Only active feature can be used');
 
-  //   $this->assertDatabaseHas('feature_usages', [
-  //     'feature_id' => $feature->id,
-  //     'subscription_id' => $subscription->id,
-  //     'used' => $usage,
-  //     'ends_at' => $feature->calculateNextRecurrenceEnd($subscription->starts_at),
-  //   ]);
-  // }
+    $subscription->useUnitsOnFeature($feature, $usage);
 
-  // public function testModelCanUseANotConsumableFeatureIfItIsAvailable()
-  // {
-  //   $plan = Plan::factory()->createOne();
-  //   $feature = Feature::factory()->notConsumable()->createOne();
-  //   $feature->plans()->attach($plan);
+    Event::assertNotDispatched(FeatureUsed::class);
 
-  //   $subscriber = User::factory()->createOne();
-  //   $subscriber->subscribeTo($plan);
+    $this->assertDatabaseHas('feature_subscription', [
+      'feature_id' => $feature->id,
+      'subscription_id' => $subscription->id,
+      'used' => $usage,
+      'active' => false,
+      'ends_at' => $feature->calculateNextRecurrenceEnd($subscription->starts_at),
+    ]);
+  }
 
-  //   $subscriber->consume($feature->name);
+  public function test_model_cant_use_missing_feature()
+  {
+    $units = $this->faker->numberBetween(5, 10);
+    $used = $this->faker->numberBetween(1, $units);
 
-  //   $this->assertDatabaseHas('feature_usages', [
-  //     'used' => null,
-  //     'feature_id' => $feature->id,
-  //     'subscriber_id' => $subscriber->id,
-  //   ]);
-  // }
+    $plan = Plan::factory()->createOne();
 
-  // public function testModelCantUseAnUnavailableFeature()
-  // {
-  //   $units = $this->faker->numberBetween(5, 10);
-  //   $usage = $this->faker->numberBetween(1, $units);
+    $feature = Feature::factory()->consumable()->createOne();
+    $missingFeature = Feature::factory()->consumable()->createOne();
 
-  //   $plan = Plan::factory()->createOne();
-  //   $feature = Feature::factory()->consumable()->createOne();
-  //   $feature->plans()->attach($plan, [
-  //     'units' => $units,
-  //   ]);
+    $feature->plans()->attach($plan, [
+      'units' => $units,
+    ]);
 
-  //   $subscriber = User::factory()->createOne();
-  //   $subscriber->subscribeTo($plan, now()->subDay());
+    $subscriber = User::factory()->createOne();
+    $subscription = $subscriber->subscribeTo($plan);
 
-  //   $this->expectException(OutOfBoundsException::class);
-  //   $this->expectExceptionMessage('None of the active plans grants access to this feature.');
+    $this->expectException(FeatureNotFoundException::class);
+    $this->expectExceptionMessage('None of the plans grants access to this feature.');
 
-  //   $subscriber->consume($feature->name, $usage);
+    $subscription->useUnitsOnFeature($missingFeature, $used);
 
-  //   $this->assertDatabaseMissing('feature_usages', [
-  //     'used' => $usage,
-  //     'feature_id' => $feature->id,
-  //     'subscriber_id' => $subscriber->id,
-  //   ]);
-  // }
+    $this->assertDatabaseMissing('feature_subscription', [
+      'used' => $used,
+      'feature_id' => $feature->id,
+      'subscriber_id' => $subscriber->id,
+    ]);
+  }
 
-  // public function testModelCantUseAFeatureBeyondItsUnits()
-  // {
-  //   $units = $this->faker->numberBetween(5, 10);
-  //   $usage = $units + 1;
+  public function test_model_can_check_if_feature_is_usable()
+  {
+    $units = $this->faker->numberBetween(5, 10);
+    $overflowUsage = $units + 10;
 
-  //   $plan = Plan::factory()->createOne();
-  //   $feature = Feature::factory()->consumable()->createOne();
-  //   $feature->plans()->attach($plan, [
-  //     'units' => $units,
-  //   ]);
+    $plan = Plan::factory()->createOne();
 
-  //   $subscriber = User::factory()->createOne();
-  //   $subscriber->subscribeTo($plan);
+    $feature = Feature::factory()->consumable()->createOne();
+    $missingFeature = Feature::factory()->consumable()->createOne();
+    $inactiveFeature = Feature::factory()->inactive()->createOne();
+    $featureWithDeactivatedUsage = Feature::factory()->createOne();
 
-  //   $this->expectException(OverflowException::class);
-  //   $this->expectExceptionMessage('The feature has no enough units to this usage.');
+    $feature->plans()->attach($plan, [
+      'units' => $units,
+    ]);
 
-  //   $subscriber->consume($feature->name, $usage);
+    $featureWithDeactivatedUsage->plans()->attach($plan, [
+      'units' => $units,
+    ]);
 
-  //   $this->assertDatabaseMissing('feature_usages', [
-  //     'used' => $usage,
-  //     'feature_id' => $feature->id,
-  //     'subscriber_id' => $subscriber->id,
-  //   ]);
-  // }
+    $subscriber = User::factory()->createOne();
+    $subscription = $subscriber->subscribeTo($plan);
 
-  // public function testModelCanUseSomeAmountOfAConsumableFeature()
-  // {
-  //   $units = $this->faker->numberBetween(5, 10);
-  //   $usage = $this->faker->numberBetween(1, $units);
+    $this->assertTrue($subscription->deactivateFeature($featureWithDeactivatedUsage));
+    $this->assertTrue($subscription->canUseFeature($feature));
+    $this->assertFalse($subscription->canUseFeature($feature, $overflowUsage));
+    $this->assertFalse($subscription->canUseFeature($missingFeature));
+    $this->assertFalse($subscription->canUseFeature($inactiveFeature));
+    $this->assertFalse($subscription->canUseFeature($featureWithDeactivatedUsage));
+  }
 
-  //   $plan = Plan::factory()->createOne();
-  //   $feature = Feature::factory()->consumable()->createOne();
-  //   $feature->plans()->attach($plan, [
-  //     'units' => $units,
-  //   ]);
+  public function test_model_can_check_if_feature_has_sufficient_balance()
+  {
+    $units = $this->faker->numberBetween(5, 10);
+    $overflowUsage = $units + 10;
 
-  //   $subscriber = User::factory()->createOne();
-  //   $subscriber->subscribeTo($plan);
+    $plan = Plan::factory()->createOne();
 
-  //   $modelCanUse = $subscriber->canUse($feature->name, $usage);
+    $feature = Feature::factory()->consumable()->createOne();
 
-  //   $this->assertTrue($modelCanUse);
-  // }
+    $feature->plans()->attach($plan, [
+      'units' => $units,
+    ]);
 
-  // public function testModelCantUseSomeAmountOfAConsumableFeature()
-  // {
-  //   $units = $this->faker->numberBetween(5, 10);
-  //   $usage = $units + 1;
 
-  //   $plan = Plan::factory()->createOne();
-  //   $feature = Feature::factory()->consumable()->createOne();
-  //   $feature->plans()->attach($plan, [
-  //     'units' => $units,
-  //   ]);
+    $subscriber = User::factory()->createOne();
+    $subscription = $subscriber->subscribeTo($plan);
 
-  //   $subscriber = User::factory()->createOne();
-  //   $subscriber->subscribeTo($plan);
+    $this->assertTrue($subscription->canUseFeature($feature));
+    $this->assertTrue($subscription->hasSufficientBalance($feature, $units));
+    $this->assertFalse($subscription->hasSufficientBalance($feature, $overflowUsage));
+  }
 
-  //   $modelCanUse = $subscriber->canUse($feature->name, $usage);
+  public function test_model_can_get_remaining_units_for_feature()
+  {
+    $units = $this->faker->numberBetween(5, 10);
+    $usage = $units - 2;
+    $remainingUnits = $units - $usage;
 
-  //   $this->assertFalse($modelCanUse);
-  // }
+    $plan = Plan::factory()->createOne();
 
-  // public function testModelCanRetrieveTotalUsagesForAFeature()
-  // {
-  //   $usage = $this->faker->randomDigitNotNull();
+    $feature = Feature::factory()->consumable()->createOne();
 
-  //   $plan = Plan::factory()->createOne();
-  //   $feature = Feature::factory()->consumable()->createOne();
-  //   $feature->plans()->attach($plan);
+    $feature->plans()->attach($plan, [
+      'units' => $units,
+    ]);
 
-  //   $subscriber = User::factory()->createOne();
-  //   $subscriber->subscribeTo($plan);
-  //   $subscriber->featureUsages()
-  //     ->make([
-  //       'used' => $usage,
-  //       'ends_at' => now()->addDay(),
-  //     ])
-  //     ->feature()
-  //     ->associate($feature)
-  //     ->save();
+    $subscriber = User::factory()->createOne();
+    $subscription = $subscriber->subscribeTo($plan);
 
-  //   config()->set('soulbscription.feature_tickets', true);
+    $this->assertEquals($units, $subscription->getRemainingUnitsForFeature($feature));
 
-  //   $receivedUsage = $subscriber->getCurrentUsage($feature->name);
 
-  //   $this->assertEquals($usage, $receivedUsage);
-  // }
+    $subscription->useUnitsOnFeature($feature, $usage);
 
-  // public function testModelCanRetrieveRemainingUnitsForAFeature()
-  // {
-  //   $units = $this->faker->numberBetween(6, 10);
-  //   $usage = $this->faker->numberBetween(1, 5);
+    $this->assertEquals($remainingUnits, $subscription->getRemainingUnitsForFeature($feature));
+  }
 
-  //   $plan = Plan::factory()->createOne();
-  //   $feature = Feature::factory()->consumable()->createOne();
-  //   $feature->plans()->attach($plan, [
-  //     'units' => $units,
-  //   ]);
+  public function test_model_can_get_max_units_for_feature()
+  {
+    $units = $this->faker->numberBetween(5, 10);
 
-  //   $subscriber = User::factory()->createOne();
-  //   $subscriber->subscribeTo($plan);
-  //   $subscriber->featureUsages()
-  //     ->make([
-  //       'used' => $usage,
-  //       'ends_at' => now()->addDay(),
-  //     ])
-  //     ->feature()
-  //     ->associate($feature)
-  //     ->save();
+    $plan = Plan::factory()->createOne();
 
-  //   config()->set('soulbscription.feature_tickets', true);
+    $feature = Feature::factory()->consumable()->createOne();
 
-  //   $receivedRemainingUnits = $subscriber->getRemainingUnits($feature->name);
+    $feature->plans()->attach($plan, [
+      'units' => $units,
+    ]);
 
-  //   $this->assertEquals($units - $usage, $receivedRemainingUnits);
-  // }
+    $subscriber = User::factory()->createOne();
+    $subscription = $subscriber->subscribeTo($plan);
 
-  // public function testItDoesNotReturnNegativeUnitsForFeatures()
-  // {
-  //   $units = $this->faker->numberBetween(5, 10);
-  //   $usage = $this->faker->numberBetween($units + 1, $units * 2);
+    $this->assertEquals($units, $subscription->getMaxFeatureUnits($feature));
+  }
 
-  //   $plan = Plan::factory()->createOne();
-  //   $feature = Feature::factory()->postpaid()->createOne();
-  //   $feature->plans()->attach($plan, [
-  //     'units' => $units,
-  //   ]);
+  public function test_model_can_get_used_units_for_feature()
+  {
+    $units = $this->faker->numberBetween(5, 10);
+    $usage = $units - 2;
 
-  //   $subscriber = User::factory()->createOne();
-  //   $subscriber->subscribeTo($plan);
+    $plan = Plan::factory()->createOne();
 
-  //   $subscriber->consume($feature->name, $usage);
+    $feature = Feature::factory()->consumable()->createOne();
 
-  //   $this->assertEquals(0, $subscriber->getRemainingUnits($feature->name));
-  // }
+    $feature->plans()->attach($plan, [
+      'units' => $units,
+    ]);
 
-  // public function testItCanSetQuotaFeatureUsage()
-  // {
-  //   $units = $this->faker->numberBetween(5, 10);
-  //   $usage = $this->faker->numberBetween(1, $units / 2);
+    $subscriber = User::factory()->createOne();
+    $subscription = $subscriber->subscribeTo($plan);
 
-  //   $plan = Plan::factory()->createOne();
-  //   $feature = Feature::factory()->quota()->createOne();
-  //   $feature->plans()->attach($plan, [
-  //     'units' => $units,
-  //   ]);
+    $this->assertEquals($units, $subscription->getRemainingUnitsForFeature($feature));
 
-  //   $subscriber = User::factory()->createOne();
-  //   $subscriber->subscribeTo($plan);
+    $subscription->useUnitsOnFeature($feature, $usage);
 
-  //   $subscriber->consume($feature->name, $usage);
-  //   $subscriber->consume($feature->name, $usage);
-  //   $subscriber->setUsedQuota($feature->name, $usage);
+    $this->assertEquals($usage, $subscription->getUnitsUsedForFeature($feature));
+  }
 
-  //   $this->assertDatabaseHas('feature_usages', [
-  //     'used' => $usage,
-  //     'feature_id' => $feature->id,
-  //     'subscriber_id' => $subscriber->id,
-  //     'ends_at' => null,
-  //   ]);
-  // }
+  public function test_model_can_activate_or_deactivate_a_feature()
+  {
+    $units = $this->faker->numberBetween(5, 10);
+    $usage = $units - 2;
 
-  // public function testItCreateANotExpirableUsageForQuotaFeatures()
-  // {
-  //   $units = $this->faker->numberBetween(5, 10);
-  //   $usage = $this->faker->numberBetween(1, $units);
+    $plan = Plan::factory()->createOne();
 
-  //   $plan = Plan::factory()->createOne();
-  //   $feature = Feature::factory()->quota()->createOne();
-  //   $feature->plans()->attach($plan, [
-  //     'units' => $units,
-  //   ]);
+    $feature = Feature::factory()->consumable()->createOne();
 
-  //   $subscriber = User::factory()->createOne();
-  //   $subscriber->subscribeTo($plan);
+    $feature->plans()->attach($plan, [
+      'units' => $units,
+    ]);
 
-  //   $subscriber->consume($feature->name, $usage);
+    $subscriber = User::factory()->createOne();
+    $subscription = $subscriber->subscribeTo($plan);
 
-  //   $this->assertDatabaseHas('feature_usages', [
-  //     'used' => $usage,
-  //     'feature_id' => $feature->id,
-  //     'subscriber_id' => $subscriber->id,
-  //     'ends_at' => null,
-  //   ]);
-  // }
+    $this->assertEquals($units, $subscription->getRemainingUnitsForFeature($feature));
+    $this->assertTrue($subscription->deactivateFeature($feature));
+
+    $this->expectException(CannotUseFeatureException::class);
+    $this->expectExceptionMessage('The use of this feature has been deactivated for this subscription');
+
+    $subscription->useUnitsOnFeature($feature, $usage);
+
+    $this->assertEquals(0, $subscription->getUnitsUsedForFeature($feature));
+
+    $this->assertTrue($subscription->activateFeature($feature));
+
+    $subscription->useUnitsOnFeature($feature, $usage);
+
+    $this->assertEquals($usage, $subscription->getUnitsUsedForFeature($feature));
+  }
 }
