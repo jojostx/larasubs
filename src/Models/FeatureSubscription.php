@@ -131,7 +131,7 @@ class FeatureSubscription extends Model
 
     public function isActive(): bool
     {
-        return (bool) $this->active;
+        return $this->active;
     }
 
     public function isInactive(): bool
