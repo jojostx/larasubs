@@ -36,6 +36,7 @@ To start using it, you just have to add the given trait to your `User` model (or
 ```php
 <?php
 namespace App\Models;
+
 use Jojostx\Larasubs\Models\Concerns\HasSubscriptions;
 
 class User
@@ -53,6 +54,7 @@ First things first, you have to define the plans you'll offer. In the example be
 ```php
 <?php
 namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 use Jojostx\Larasubs\Enums\IntervalType;
 use Jojostx\Larasubs\Models\Models\Plan;
