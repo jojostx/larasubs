@@ -148,7 +148,6 @@ class FeatureSeeder extends Seeder
             'active' => true,
             'interval'      => 1,
             'interval_type' => IntervalType::DAY,
-            'sort_order',
         ]);
     }
 }
