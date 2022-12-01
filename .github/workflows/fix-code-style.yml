@@ -1,23 +1,22 @@
-name: Check & fix styling
+name: fix-code-style
 
-on: [push]
+on: push
 
 jobs:
-  php-cs-fixer:
+  fix-code-style:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           ref: ${{ github.head_ref }}
-
-      - name: Run PHP CS Fixer
-        uses: docker://oskarstark/php-cs-fixer-ga
-        with:
-          args: --config=.php_cs.dist.php --allow-risky=yes
-
+      - name: Install dependencies
+        run: |
+          composer install --no-interaction
+      - name: Run Pint
+        run: composer pint
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Fix styling
+          commit_message: >
+            chore: fix code style
