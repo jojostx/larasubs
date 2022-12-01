@@ -37,6 +37,7 @@ To start using it, you just have to add the given trait to your `User` model (or
 <?php
 namespace App\Models;
 use Jojostx\Larasubs\Models\Concerns\HasSubscriptions;
+
 class User
 {
     use HasSubscriptions;
