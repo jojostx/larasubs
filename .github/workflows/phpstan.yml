@@ -15,4 +15,4 @@ jobs:
       with:
         path: src/
         configuration: ./phpstan.neon.dist
-        command: analyse --memory-limit=2G
+        memory-limit: 2G
