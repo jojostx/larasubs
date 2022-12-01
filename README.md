@@ -4,7 +4,7 @@
 
 <p align="center">
 <a href="https://packagist.org/packages/lucasdotvin/laravel-soulbscription">
-<img alt="Latest Version on Packagist" src="https://img.shields.io/packagist/v/lucasdotvin/laravel-soulbscription.svg?style=flat-square">
+<img alt="Latest Version on Packagist" src="https://img.shields.io/packagist/v/jojostx/larasubs?include_prereleases">
 </a>
 <a href="https://github.com/jojostx/larasubs/actions?query=workflow%3Arun-tests+branch%3Amain">
 <img alt="GitHub Tests Action Status" src="https://img.shields.io/github/workflow/status/jojostx/larasubs/run-tests">
@@ -13,7 +13,7 @@
 <img alt="GitHub Code Style Action Status" src="https://github.com/jojostx/larasubs/actions/workflows/fix-code-style.yml/badge.svg">
 </a>
 <a href="https://packagist.org/packages/lucasdotvin/laravel-soulbscription">
-<img alt="Total Downloads" src="https://img.shields.io/packagist/dt/lucasdotvin/laravel-soulbscription.svg?style=flat-square">
+<img alt="Total Downloads" src="https://img.shields.io/packagist/dt/jojostx/larasubs?color=green&style=flat">
 </a>
 </p>
 
