@@ -19,26 +19,26 @@ class FeatureSubscriptionFactory extends Factory
     public function definition()
     {
         return [
-            'feature_id'      => Feature::factory(),
-            'subscription_id'   => Subscription::factory(),
-            'active'       => true,
-            'used'     => $this->faker->randomDigitNotNull(),
-            'ends_at'      =>  now(),
+            'feature_id' => Feature::factory(),
+            'subscription_id' => Subscription::factory(),
+            'active' => true,
+            'used' => $this->faker->randomDigitNotNull(),
+            'ends_at' => now(),
         ];
     }
 
     public function active()
     {
-      return $this->state([
-        'active'       => true,
-      ]);
+        return $this->state([
+            'active' => true,
+        ]);
     }
-  
+
     public function inactive()
     {
-      return $this->state([
-        'active'       => false,
-      ]);
+        return $this->state([
+            'active' => false,
+        ]);
     }
 
     public function ended()

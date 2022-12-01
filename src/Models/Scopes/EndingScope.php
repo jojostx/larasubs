@@ -17,8 +17,7 @@ class EndingScope implements Scope
     public function apply(Builder $builder, Model $model)
     {
         $builder->where(
-            fn (Builder $query) =>
-            $query->where('ends_at', '>', now())
+            fn (Builder $query) => $query->where('ends_at', '>', now())
                 ->orWhereNull('ends_at')
         );
     }
@@ -45,8 +44,7 @@ class EndingScope implements Scope
     {
         $builder->macro('withoutEnded', function (Builder $builder) {
             $builder->withoutGlobalScope($this)->where(
-                fn (Builder $query) =>
-                $query->where('ends_at', '>', now())
+                fn (Builder $query) => $query->where('ends_at', '>', now())
                     ->orWhereNull('ends_at')
             );
 
@@ -58,8 +56,7 @@ class EndingScope implements Scope
     {
         $builder->macro('onlyEnded', function (Builder $builder) {
             $builder->withoutGlobalScope($this)->where(
-                fn (Builder $query) =>
-                $query->where('ends_at', '<=', now())
+                fn (Builder $query) => $query->where('ends_at', '<=', now())
                     ->whereNotNull('ends_at')
             );
 

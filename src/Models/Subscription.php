@@ -3,20 +3,19 @@
 namespace Jojostx\Larasubs\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
-use Jojostx\Larasubs\Events;
-use Jojostx\Larasubs\Models\Concerns;
-use Jojostx\Larasubs\Services\Period;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Facades\DB;
+use Jojostx\Larasubs\Events;
+use Jojostx\Larasubs\Services\Period;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Translatable\HasTranslations;
 
-/** 
+/**
  * @property int $id
  * @property string $slug
  * @property \Carbon\Carbon|null $starts_at
@@ -27,7 +26,6 @@ use Spatie\Translatable\HasTranslations;
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
  * @property \Carbon\Carbon|null $deleted_at
- * 
  * @property-read \Jojostx\Larasubs\Models\Plan  $plan
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent  $subscriber
  */
@@ -43,10 +41,13 @@ class Subscription extends Model
     /**
      * Subscription statuses
      */
-    const STATUS_ENDED      = 'ended';
-    const STATUS_OVERDUE    = 'overdue';
-    const STATUS_ACTIVE     = 'active';
-    const STATUS_CANCELLED  = 'cancelled';
+    const STATUS_ENDED = 'ended';
+
+    const STATUS_OVERDUE = 'overdue';
+
+    const STATUS_ACTIVE = 'active';
+
+    const STATUS_CANCELLED = 'cancelled';
 
     protected $dates = [
         'grace_ends_at',
@@ -181,7 +182,7 @@ class Subscription extends Model
 
     /**
      * Scope query to return only active subscriptions.
-     * 
+     *
      * (active means the subscription has started,
      * is not overdue and is not cancelled)
      */
@@ -196,7 +197,7 @@ class Subscription extends Model
 
     /**
      * Scope query to return only inactive subscriptions.
-     * 
+     *
      * (not active means the subscription is overdue
      * or it has not started, or it has been cancelled)
      */
@@ -272,7 +273,7 @@ class Subscription extends Model
 
         return $query
             ->where('ends_at', '<', $date)
-            ->whereRaw("COALESCE(grace_ends_at, ?) <= ?", [$date, $date]);
+            ->whereRaw('COALESCE(grace_ends_at, ?) <= ?', [$date, $date]);
     }
 
     /**
@@ -298,7 +299,7 @@ class Subscription extends Model
     }
 
     /**
-     * Scope query to return subscriptions that are overdue 
+     * Scope query to return subscriptions that are overdue
      * before the provided date.
      */
     public function scopeWhereOverdueBefore(Builder $query, Carbon $date = null): Builder
@@ -313,7 +314,7 @@ class Subscription extends Model
 
         return $query
             ->where('ends_at', '<=', $date)
-            ->whereRaw("COALESCE(grace_ends_at, ?) <= ?", [$date, $date]);
+            ->whereRaw('COALESCE(grace_ends_at, ?) <= ?', [$date, $date]);
     }
 
     /**
@@ -329,7 +330,7 @@ class Subscription extends Model
     }
 
     /**
-     * Scope a query to return subscriptions that ends before the 
+     * Scope a query to return subscriptions that ends before the
      * provided days from now.
      */
     public function scopeWhereEndsInDaysFromNow(Builder $query, int $dayRange = 3): Builder
@@ -378,7 +379,7 @@ class Subscription extends Model
         $this->usage()
             ->whereIn('feature_id', $new_plan_features)
             ->update([
-                'ends_at' => $this->ends_at
+                'ends_at' => $this->ends_at,
             ]);
 
         // delete all usage for this subscription that are not available on the new plan
@@ -412,7 +413,7 @@ class Subscription extends Model
 
             // Attach new plan to subscription
             return $this->forceFill([
-                'plan_id' => $plan->getKey()
+                'plan_id' => $plan->getKey(),
             ])->save();
         });
 
@@ -454,7 +455,7 @@ class Subscription extends Model
      */
     public function renew(?Carbon $endDate = null): bool
     {
-        if (!$this->isEnded()) {
+        if (! $this->isEnded()) {
             return false;
         }
 
@@ -470,10 +471,10 @@ class Subscription extends Model
         return $updated;
     }
 
-    /** 
+    /**
      * Cancel a subscription
      * - sets the **cancels_at** attribute to the $cancelDate.
-     * - if $immediately is set to true, the **ends_at** attribute 
+     * - if $immediately is set to true, the **ends_at** attribute
      * is set to the $cancelDate.
      * - if $cancelDate is not given, the current date is used.
      */
@@ -492,7 +493,7 @@ class Subscription extends Model
         return $saved;
     }
 
-    /** 
+    /**
      * Cancel a subscription immediately
      * - sets **ends_at** and **cancels_at** attribute to $cancelDate
      * - if $cancelDate is not given defaults the current date.
@@ -509,13 +510,13 @@ class Subscription extends Model
         return $saved;
     }
 
-    /** 
+    /**
      * Reactivate a cancelled subscription
      * - can only activate a cancelled subscription that has not ended
      */
     public function reactivate(): bool
     {
-        if ($this->isCancelled() && !$this->ended()) {
+        if ($this->isCancelled() && ! $this->ended()) {
             $this->cancels_at = null;
 
             $saved = $this->save();
@@ -530,7 +531,7 @@ class Subscription extends Model
 
     protected function getRenewedEnd(?Carbon $endDate = null): Carbon
     {
-        if (!empty($endDate)) {
+        if (! empty($endDate)) {
             return $endDate;
         }
 
@@ -545,7 +546,7 @@ class Subscription extends Model
      * Set a new subscription period
      * - It does not persist the dates to the **DB**
      */
-    public function setNewPeriod(string $interval_type = '', int $interval = 1, string|Carbon $starts_at = '')
+    public function setNewPeriod(string $interval_type = '', int $interval = 1, string | Carbon $starts_at = '')
     {
         if (empty($interval_type)) {
             $interval_type = $this->plan->interval_type;
@@ -580,7 +581,7 @@ class Subscription extends Model
      */
     public function notStarted()
     {
-        return !$this->started();
+        return ! $this->started();
     }
 
     /**
@@ -588,7 +589,7 @@ class Subscription extends Model
      */
     public function isActive(): bool
     {
-        return !($this->isEnded() || $this->isCancelledImmediately());
+        return ! ($this->isEnded() || $this->isCancelledImmediately());
     }
 
     /**
@@ -596,7 +597,7 @@ class Subscription extends Model
      */
     public function isInactive(): bool
     {
-        return !$this->isActive();
+        return ! $this->isActive();
     }
 
     /**
@@ -622,7 +623,7 @@ class Subscription extends Model
      */
     public function onTrial(): bool
     {
-        return !is_null($this->trial_ends_at) ? $this->trial_ends_at->isFuture() : false;
+        return ! is_null($this->trial_ends_at) ? $this->trial_ends_at->isFuture() : false;
     }
 
     /**
@@ -630,7 +631,7 @@ class Subscription extends Model
      */
     public function isCancelled(): bool
     {
-        return !is_null($this->cancels_at);
+        return ! is_null($this->cancels_at);
     }
 
     /**
@@ -638,7 +639,7 @@ class Subscription extends Model
      */
     public function notCancelled()
     {
-        return !$this->isCancelled();
+        return ! $this->isCancelled();
     }
 
     /**
@@ -683,7 +684,7 @@ class Subscription extends Model
      */
     public function isEnded(): bool
     {
-        return !is_null($this->ends_at) ? $this->ends_at->isPast() : false;
+        return ! is_null($this->ends_at) ? $this->ends_at->isPast() : false;
     }
 
     /**

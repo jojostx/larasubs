@@ -11,106 +11,106 @@ use Jojostx\Larasubs\Tests\TestCase;
 
 class FeatureTest extends TestCase
 {
-  use RefreshDatabase;
-  use WithFaker;
+    use RefreshDatabase;
+    use WithFaker;
 
-  public function test_model_calculates_yearly_expiration()
-  {
-    Carbon::setTestNow(now());
+    public function test_model_calculates_yearly_expiration()
+    {
+        Carbon::setTestNow(now());
 
-    $years = $this->faker->randomDigitNotNull();
+        $years = $this->faker->randomDigitNotNull();
 
-    $feature = Feature::factory()->create([
-      'interval' => $years,
-      'interval_type' => IntervalType::YEAR,
-    ]);
+        $feature = Feature::factory()->create([
+            'interval' => $years,
+            'interval_type' => IntervalType::YEAR,
+        ]);
 
-    $this->assertEquals(now()->addYears($years), $feature->calculateNextRecurrenceEnd());
-  }
+        $this->assertEquals(now()->addYears($years), $feature->calculateNextRecurrenceEnd());
+    }
 
-  public function test_model_calculates_monthly_expiration()
-  {
-    Carbon::setTestNow(now());
+    public function test_model_calculates_monthly_expiration()
+    {
+        Carbon::setTestNow(now());
 
-    $months = $this->faker->randomDigitNotNull();
+        $months = $this->faker->randomDigitNotNull();
 
-    $feature = Feature::factory()->create([
-      'interval' => $months,
-      'interval_type' =>  IntervalType::MONTH,
-    ]);
+        $feature = Feature::factory()->create([
+            'interval' => $months,
+            'interval_type' => IntervalType::MONTH,
+        ]);
 
-    $this->assertEquals(now()->addMonths($months), $feature->calculateNextRecurrenceEnd());
-  }
+        $this->assertEquals(now()->addMonths($months), $feature->calculateNextRecurrenceEnd());
+    }
 
-  public function test_model_calculates_weekly_expiration()
-  {
-    Carbon::setTestNow(now());
+    public function test_model_calculates_weekly_expiration()
+    {
+        Carbon::setTestNow(now());
 
-    $weeks = $this->faker->randomDigitNotNull();
-    $feature = Feature::factory()->create([
-      'interval_type' => IntervalType::WEEK,
-      'interval' => $weeks,
-    ]);
+        $weeks = $this->faker->randomDigitNotNull();
+        $feature = Feature::factory()->create([
+            'interval_type' => IntervalType::WEEK,
+            'interval' => $weeks,
+        ]);
 
-    $this->assertEquals(now()->addWeeks($weeks), $feature->calculateNextRecurrenceEnd());
-  }
+        $this->assertEquals(now()->addWeeks($weeks), $feature->calculateNextRecurrenceEnd());
+    }
 
-  public function test_model_calculates_daily_expiration()
-  {
-    Carbon::setTestNow(now());
+    public function test_model_calculates_daily_expiration()
+    {
+        Carbon::setTestNow(now());
 
-    $days = $this->faker->randomDigitNotNull();
-    $feature = Feature::factory()->create([
-      'interval_type' => IntervalType::DAY,
-      'interval' => $days,
-    ]);
+        $days = $this->faker->randomDigitNotNull();
+        $feature = Feature::factory()->create([
+            'interval_type' => IntervalType::DAY,
+            'interval' => $days,
+        ]);
 
-    $this->assertEquals(now()->addDays($days), $feature->calculateNextRecurrenceEnd());
-  }
+        $this->assertEquals(now()->addDays($days), $feature->calculateNextRecurrenceEnd());
+    }
 
-  public function test_model_calculates_next_recurrence_end_considering_recurrences()
-  {
-    Carbon::setTestNow(now());
+    public function test_model_calculates_next_recurrence_end_considering_recurrences()
+    {
+        Carbon::setTestNow(now());
 
-    $feature = Feature::factory()->create([
-      'interval' => 2,
-      'interval_type' => IntervalType::WEEK
-    ]);
+        $feature = Feature::factory()->create([
+            'interval' => 2,
+            'interval_type' => IntervalType::WEEK,
+        ]);
 
-    $startDate = now()->subDays(11);
+        $startDate = now()->subDays(11);
 
-    $this->assertEquals(now()->addDays(3), $feature->calculateNextRecurrenceEnd($startDate));
-  }
+        $this->assertEquals(now()->addDays(3), $feature->calculateNextRecurrenceEnd($startDate));
+    }
 
-  public function test_model_is_not_consumable_by_default()
-  {
-    $creationPayload = Feature::factory()->raw();
+    public function test_model_is_not_consumable_by_default()
+    {
+        $creationPayload = Feature::factory()->raw();
 
-    unset($creationPayload['consumable']);
+        unset($creationPayload['consumable']);
 
-    $feature = Feature::create($creationPayload);
+        $feature = Feature::create($creationPayload);
 
-    $this->assertDatabaseHas('features', [
-      'id' => $feature->id,
-      'consumable' => false,
-    ]);
-  }
+        $this->assertDatabaseHas('features', [
+            'id' => $feature->id,
+            'consumable' => false,
+        ]);
+    }
 
-  public function test_model_is_sortable()
-  {
-    $newOrder = [2, 1];
+    public function test_model_is_sortable()
+    {
+        $newOrder = [2, 1];
 
-    Feature::factory(2)->create();
-    Feature::setNewOrder($newOrder);
-    $orderFeatures = Feature::ordered()->pluck('id');
+        Feature::factory(2)->create();
+        Feature::setNewOrder($newOrder);
+        $orderFeatures = Feature::ordered()->pluck('id');
 
-    $this->assertEquals($newOrder, $orderFeatures->toArray());
-  }
+        $this->assertEquals($newOrder, $orderFeatures->toArray());
+    }
 
-  public function test_model_has_slug()
-  {
-    $feature = Feature::factory()->create(['name' => 'test feature']);
+    public function test_model_has_slug()
+    {
+        $feature = Feature::factory()->create(['name' => 'test feature']);
 
-    $this->assertEquals('test-feature', $feature->slug);
-  }
+        $this->assertEquals('test-feature', $feature->slug);
+    }
 }

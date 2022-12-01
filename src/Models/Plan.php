@@ -15,8 +15,7 @@ use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Translatable\HasTranslations;
 
-
-/** 
+/**
  * @property int $id
  * @property string $name
  * @property string $slug
@@ -33,7 +32,6 @@ use Spatie\Translatable\HasTranslations;
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
  * @property \Carbon\Carbon|null $deleted_at
- *
  * @property-read \Illuminate\Database\Eloquent\Collection|\Jojostx\Larasubs\Models\Subscription[] $subscriptions
  * @property-read \Illuminate\Database\Eloquent\Collection|\Jojostx\Larasubs\Models\Feature[] $features
  */
@@ -95,11 +93,11 @@ class Plan extends Model
         parent::boot();
 
         static::saving(function ($model) {
-            if (!$model->interval) {
+            if (! $model->interval) {
                 $model->interval_type = IntervalType::MONTH;
             }
 
-            if (!$model->interval) {
+            if (! $model->interval) {
                 $model->interval = 1;
             }
         });
@@ -138,7 +136,6 @@ class Plan extends Model
     {
         return $this->hasMany(config('larasubs.models.subscription'));
     }
-
 
     /**
      * Scope query to return only active plans.
@@ -205,7 +202,7 @@ class Plan extends Model
 
     public function isInactive(): bool
     {
-        return !$this->isActive();
+        return ! $this->isActive();
     }
 
     /**

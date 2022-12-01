@@ -19,8 +19,8 @@ class FeaturePlanFactory extends Factory
     public function definition()
     {
         return [
-            'feature_id'      => Feature::factory(),
-            'plan_id'     => Plan::factory(),
+            'feature_id' => Feature::factory(),
+            'plan_id' => Plan::factory(),
             'units' => $this->faker->randomDigitNotNull(),
         ];
     }

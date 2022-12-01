@@ -9,13 +9,13 @@ use Illuminate\Queue\SerializesModels;
 
 class SubscriptionStarted
 {
-  use Dispatchable;
-  use InteractsWithSockets;
-  use SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
-  public function __construct(
-      public Model $subscription,
-  ) {
+    public function __construct(
+        public Model $subscription,
+    ) {
       //
-  }
+    }
 }

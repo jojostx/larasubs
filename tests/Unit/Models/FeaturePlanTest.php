@@ -11,47 +11,47 @@ use Jojostx\Larasubs\Tests\TestCase;
 
 class FeaturePlanTest extends TestCase
 {
-  use RefreshDatabase;
-  use WithFaker;
+    use RefreshDatabase;
+    use WithFaker;
 
-  public function test_model_can_retrieve_plan()
-  {
-    $feature = Feature::factory()
-      ->create();
+    public function test_model_can_retrieve_plan()
+    {
+        $feature = Feature::factory()
+          ->create();
 
-    $plan = Plan::factory()->create();
-    $plan->features()->attach($feature);
+        $plan = Plan::factory()->create();
+        $plan->features()->attach($feature);
 
-    $featurePlanPivot = FeaturePlan::first();
+        $featurePlanPivot = FeaturePlan::first();
 
-    $this->assertEquals($plan->id, $featurePlanPivot->plan->id);
-  }
+        $this->assertEquals($plan->id, $featurePlanPivot->plan->id);
+    }
 
-  public function test_model_can_retrieve_feature()
-  {
-    $feature = Feature::factory()
-      ->create();
+    public function test_model_can_retrieve_feature()
+    {
+        $feature = Feature::factory()
+          ->create();
 
-    $plan = Plan::factory()->create();
-    $plan->features()->attach($feature);
+        $plan = Plan::factory()->create();
+        $plan->features()->attach($feature);
 
-    $featurePlanPivot = FeaturePlan::first();
+        $featurePlanPivot = FeaturePlan::first();
 
-    $this->assertEquals($feature->id, $featurePlanPivot->feature->id);
-  }
+        $this->assertEquals($feature->id, $featurePlanPivot->feature->id);
+    }
 
-  public function test_model_has_units()
-  {
-    $feature = Feature::factory()
-      ->create();
+    public function test_model_has_units()
+    {
+        $feature = Feature::factory()
+          ->create();
 
-    $plan = Plan::factory()->create();
-    $plan->features()->attach($feature);
+        $plan = Plan::factory()->create();
+        $plan->features()->attach($feature);
 
-    $featurePlanPivot = FeaturePlan::first();
-    $featurePlanPivot->update(['units' => 5]);
+        $featurePlanPivot = FeaturePlan::first();
+        $featurePlanPivot->update(['units' => 5]);
 
-    $this->assertEquals($feature->id, $featurePlanPivot->feature->id);
-    $this->assertEquals(5, $featurePlanPivot->units);
-  }
+        $this->assertEquals($feature->id, $featurePlanPivot->feature->id);
+        $this->assertEquals(5, $featurePlanPivot->units);
+    }
 }

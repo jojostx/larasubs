@@ -8,56 +8,56 @@ use Jojostx\Larasubs\Models\Feature;
 
 class FeatureFactory extends Factory
 {
-  protected $model = Feature::class;
+    protected $model = Feature::class;
 
-  /**
-   * Define the model's default state.
-   *
-   * @return array
-   */
-  public function definition()
-  {
-    return [
-      'name'             => $this->faker->words(asText: true),
-      'consumable'       => $this->faker->boolean(),
-      'active'       => true,
-      'interval'      => $this->faker->randomDigitNotNull(),
-      'interval_type' => $this->faker->randomElement([
-        IntervalType::YEAR,
-        IntervalType::MONTH,
-        IntervalType::WEEK,
-        IntervalType::DAY
-      ]),
-    ];
-  }
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'name' => $this->faker->words(asText: true),
+            'consumable' => $this->faker->boolean(),
+            'active' => true,
+            'interval' => $this->faker->randomDigitNotNull(),
+            'interval_type' => $this->faker->randomElement([
+                IntervalType::YEAR,
+                IntervalType::MONTH,
+                IntervalType::WEEK,
+                IntervalType::DAY,
+            ]),
+        ];
+    }
 
-  public function active()
-  {
-    return $this->state([
-      'active'       => true,
-    ]);
-  }
+    public function active()
+    {
+        return $this->state([
+            'active' => true,
+        ]);
+    }
 
-  public function inactive()
-  {
-    return $this->state([
-      'active'       => false,
-    ]);
-  }
+    public function inactive()
+    {
+        return $this->state([
+            'active' => false,
+        ]);
+    }
 
-  public function consumable()
-  {
-    return $this->state(fn (array $attributes) => [
-      'consumable' => true,
-    ]);
-  }
+    public function consumable()
+    {
+        return $this->state(fn (array $attributes) => [
+            'consumable' => true,
+        ]);
+    }
 
-  public function notConsumable()
-  {
-    return $this->state(fn (array $attributes) => [
-      'consumable' => false,
-      'interval' => null,
-      'interval_type' => null,
-    ]);
-  }
+    public function notConsumable()
+    {
+        return $this->state(fn (array $attributes) => [
+            'consumable' => false,
+            'interval' => null,
+            'interval_type' => null,
+        ]);
+    }
 }

@@ -8,27 +8,27 @@ use Throwable;
 
 class FeatureNotFoundException extends ModelNotFoundException
 {
-  /**
-   * The intended feature.
-   *
-   * @var Feature
-   */
-  protected $feature;
+    /**
+     * The intended feature.
+     *
+     * @var Feature
+     */
+    protected $feature;
 
-  public function __construct(Feature $feature, int $code = 0, Throwable|null $previous = null)
-  {
-    $this->feature = $feature;
+    public function __construct(Feature $feature, int $code = 0, Throwable | null $previous = null)
+    {
+        $this->feature = $feature;
 
-    parent::__construct('None of the plans grants access to this feature.', $code, $previous);
-  }
+        parent::__construct('None of the plans grants access to this feature.', $code, $previous);
+    }
 
-  /**
-   * Get the feature.
-   *
-   * @return Feature
-   */
-  public function getFeature()
-  {
-    return $this->feature;
-  }
+    /**
+     * Get the feature.
+     *
+     * @return Feature
+     */
+    public function getFeature()
+    {
+        return $this->feature;
+    }
 }

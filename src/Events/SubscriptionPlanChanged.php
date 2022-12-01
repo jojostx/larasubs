@@ -10,15 +10,15 @@ use Jojostx\Larasubs\Models\Plan;
 
 class SubscriptionPlanChanged
 {
-  use Dispatchable;
-  use InteractsWithSockets;
-  use SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
-  public function __construct(
-      public Model $subscription,
-      public Plan $old_plan,
-      public Plan $new_plan
-  ) {
+    public function __construct(
+        public Model $subscription,
+        public Plan $old_plan,
+        public Plan $new_plan
+    ) {
       //
-  }
+    }
 }

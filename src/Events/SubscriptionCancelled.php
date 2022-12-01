@@ -9,14 +9,14 @@ use Illuminate\Queue\SerializesModels;
 
 class SubscriptionCancelled
 {
-  use Dispatchable;
-  use InteractsWithSockets;
-  use SerializesModels;
+    use Dispatchable;
+    use InteractsWithSockets;
+    use SerializesModels;
 
-  public function __construct(
-      public Model $subscription,
-      public bool $wasCancelledImmediately
-  ) {
+    public function __construct(
+        public Model $subscription,
+        public bool $wasCancelledImmediately
+    ) {
       //
-  }
+    }
 }

@@ -14,20 +14,19 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $this->loadLaravelMigrations();
 
         Factory::guessFactoryNamesUsing(
-          fn (string $modelName) =>
-          'Jojostx\\Larasubs\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
+            fn (string $modelName) => 'Jojostx\\Larasubs\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
         );
     }
 
     protected function getPackageProviders($app)
     {
-      return [
-        LarasubsServiceProvider::class,
-      ];
+        return [
+            LarasubsServiceProvider::class,
+        ];
     }
-  
+
     public function getEnvironmentSetUp($app)
     {
-      config()->set('database.default', 'testing');
+        config()->set('database.default', 'testing');
     }
 }

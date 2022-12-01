@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
-/** 
+/**
  * @property int $id
  * @property string $slug
  * @property bool   $active
@@ -30,7 +30,7 @@ class FeatureSubscription extends Model
         'active',
         'used',
         'ends_at',
-        'timezone'
+        'timezone',
     ];
 
     /**
@@ -91,10 +91,10 @@ class FeatureSubscription extends Model
 
         return $builder->where('feature_id', $feature->getKey() ?? null);
     }
+
     /**
      * Find ended subscriptions.
      */
-
     public function scopeWhereEnded(Builder $query): Builder
     {
         $date = Carbon::now();
@@ -144,7 +144,7 @@ class FeatureSubscription extends Model
 
     public function isInactive(): bool
     {
-        return !$this->isActive();
+        return ! $this->isActive();
     }
 
     /**
@@ -168,6 +168,6 @@ class FeatureSubscription extends Model
      */
     public function notEnded(): bool
     {
-        return !$this->ended();
+        return ! $this->ended();
     }
 }
