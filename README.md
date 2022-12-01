@@ -1,4 +1,6 @@
-<h1 align="center">Larasubs</h1>
+<p align="center">
+    <img src="./art/larasubs.png" alt="Banner" style="width: 100%;" />
+</p>
 
 <p align="center">
 <a href="https://packagist.org/packages/lucasdotvin/laravel-soulbscription">
@@ -18,6 +20,14 @@
 ## About
 
 This package provides a straightforward interface to handle subscriptions and features consumption.
+
+## Installation
+
+You can install the package via composer:
+
+```bash
+composer require jojostx/larasubs
+```
 
 ## Usage
 
