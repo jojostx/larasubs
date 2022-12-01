@@ -22,9 +22,9 @@ if (!function_exists('generateFlwRef')) {
     function generateFlwRef(string $transactionPrefix = NULL): string
     {
         if ($transactionPrefix) {
-            return $transactionPrefix . '_' . uniqid(time());
+            return $transactionPrefix . '_' . uniqid(strval(time()));
         }
-        return 'flw_' . uniqid(time());
+        return 'flw_' . uniqid(strval(time()));
     }
 }
 
@@ -42,21 +42,21 @@ if (!function_exists('convertArrayToObject')) {
 
         $object = new stdClass();
 
-        function arrayToObject($array, &$obj)
+        $arrayToObject = function ($array, &$obj) use (&$arrayToObject)
         {
             foreach ($array as $key => $value) {
                 if (is_array($value)) {
                     $obj->$key = new stdClass();
-                    arrayToObject($value, $obj->$key);
+                    $arrayToObject($value, $obj->$key);
                 } else {
                     $obj->$key = $value;
                 }
             }
 
             return $obj;
-        }
+        };
 
-        return arrayToObject($resp, $object);
+        return $arrayToObject($resp, $object);
     }
 }
 

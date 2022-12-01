@@ -16,6 +16,21 @@ use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Translatable\HasTranslations;
 
+/** 
+ * @property int $id
+ * @property string $slug
+ * @property \Carbon\Carbon|null $starts_at
+ * @property \Carbon\Carbon|null $ends_at
+ * @property \Carbon\Carbon|null $cancels_at
+ * @property \Carbon\Carbon|null $trial_ends_at
+ * @property \Carbon\Carbon|null $grace_ends_at
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property \Carbon\Carbon|null $deleted_at
+ * 
+ * @property-read \Jojostx\Larasubs\Models\Plan  $plan
+ * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent  $subscriber
+ */
 class Subscription extends Model
 {
     use HasFactory;
@@ -268,8 +283,7 @@ class Subscription extends Model
     {
         $date = Carbon::now();
 
-        return $query
-            ->where('ends_at', '<', $date);
+        return $query->where('ends_at', '<', $date);
     }
 
     /**
@@ -624,7 +638,7 @@ class Subscription extends Model
      */
     public function notCancelled()
     {
-        return !$this->cancelled();
+        return !$this->isCancelled();
     }
 
     /**

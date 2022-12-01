@@ -15,6 +15,28 @@ use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Translatable\HasTranslations;
 
+
+/** 
+ * @property int $id
+ * @property string $name
+ * @property string $slug
+ * @property string $description
+ * @property bool   $active
+ * @property int    $price
+ * @property string $currency
+ * @property int $interval
+ * @property string $interval_type
+ * @property int $trial_interval
+ * @property string $trial_interval_type
+ * @property int $grace_interval
+ * @property string $grace_interval_type
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property \Carbon\Carbon|null $deleted_at
+ *
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Jojostx\Larasubs\Models\Subscription[] $subscriptions
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Jojostx\Larasubs\Models\Feature[] $features
+ */
 class Plan extends Model
 {
     use HasFactory;

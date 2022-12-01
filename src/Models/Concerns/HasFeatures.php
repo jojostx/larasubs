@@ -11,6 +11,9 @@ use Jojostx\Larasubs\Models\Exceptions\FeatureNotFoundException;
 use Jojostx\Larasubs\Models\Feature;
 use Jojostx\Larasubs\Models\FeatureSubscription;
 
+/** 
+ * @property-read \Illuminate\Database\Eloquent\Collection|\Jojostx\Larasubs\Models\Feature[] $features
+ */
 trait HasFeatures
 {
   /**
@@ -41,7 +44,7 @@ trait HasFeatures
   {
     $this->loadMissing('plan.features');
 
-    return $this->plan->features ?? collect();
+    return $this->plan->features;
   }
 
   /**
@@ -102,6 +105,7 @@ trait HasFeatures
 
     // create or return a record in the Feature_Subscription table (usage) 
     // for the subcription and for the $feature.
+    /** @var FeatureSubscription  */
     $usage = $this->usage()
       ->firstOrCreate(
         [
@@ -244,9 +248,10 @@ trait HasFeatures
   {
     $featureSlug = $this->getFeatureSlug($featureSlug);
 
+    /** @var FeatureSubscription|null */
     $usage = $this->usage()->whereFeatureSlug($featureSlug)->first();
 
-    return (is_null($usage) || $usage->ended()) ? 0 : $usage->used;
+    return (\is_null($usage)) ? 0 : $usage->used;
   }
 
   /**
@@ -265,15 +270,15 @@ trait HasFeatures
 
     if ($feature->interval_type && $feature->interval) {
       // Set expiration date when the usage record is new or doesn't have one.
-      if (!$featureUsage->ended()) {
-        // Set date from subscription creation date so the reset
-        // period match the period specified by the subscription's plan.
-        $featureUsage->ends_at = $feature->calculateNextRecurrenceEnd($this->created_at);
-      } elseif ($featureUsage->ended()) {
+      if ($featureUsage->ended()) {
         // If the usage record has been expired, let's assign
         // a new expiration date and reset the uses to zero.
         $featureUsage->ends_at = $feature->calculateNextRecurrenceEnd($featureUsage->ends_at);
         $featureUsage->used = 0;
+      } else {
+        // Set date from subscription creation date so the reset
+        // period match the period specified by the subscription's plan.
+        $featureUsage->ends_at = $feature->calculateNextRecurrenceEnd($this->created_at);
       }
     }
 

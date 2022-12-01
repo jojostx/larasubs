@@ -6,6 +6,7 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Jojostx\Larasubs\Models\Plan;
 
 class SubscriptionPlanChanged
 {
@@ -15,8 +16,8 @@ class SubscriptionPlanChanged
 
   public function __construct(
       public Model $subscription,
-      public Model $old_plan,
-      public Model $new_plan
+      public Plan $old_plan,
+      public Plan $new_plan
   ) {
       //
   }

@@ -13,6 +13,22 @@ use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Translatable\HasTranslations;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $slug
+ * @property string $description
+ * @property bool   $active
+ * @property bool   $consumable
+ * @property int $interval
+ * @property string $interval_type
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property \Carbon\Carbon|null $deleted_at
+ * 
+ * @property-read \Jojostx\Larasubs\Models\Plan  $plan
+ * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent  $subscriber
+ */
 class Feature extends Model
 {
     use HasFactory;

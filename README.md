@@ -20,11 +20,9 @@ class User
 
 And that's it!
 
-
 ### Setting Plans Up
 
 First things first, you have to define the plans you'll offer. In the example below, we are creating two plans.
-
 
 ```php
 <?php
@@ -73,4 +71,3 @@ Everything here is quite simple, but it is worth to emphasize: by receiving the 
 #### Grace Period
 
 You can define a grace grace for each plan, so your users will not loose access to their features immediately when the subscription ends:
-

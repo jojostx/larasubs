@@ -9,6 +9,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/** 
+ * @property int $id
+ * @property string $slug
+ * @property bool   $active
+ * @property int $used
+ * @property \Carbon\Carbon|null $ends_at
+ */
 class FeatureSubscription extends Model
 {
     use HasFactory;

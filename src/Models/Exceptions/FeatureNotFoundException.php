@@ -11,7 +11,7 @@ class FeatureNotFoundException extends ModelNotFoundException
   /**
    * The intended feature.
    *
-   * @var int
+   * @var Feature
    */
   protected $feature;
 
@@ -25,7 +25,7 @@ class FeatureNotFoundException extends ModelNotFoundException
   /**
    * Get the feature.
    *
-   * @return int
+   * @return Feature
    */
   public function getFeature()
   {

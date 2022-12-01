@@ -11,7 +11,7 @@ class CannotUseFeatureException extends RuntimeException
   /**
    * The intended feature.
    *
-   * @var int
+   * @var Feature
    */
   protected $feature;
 
@@ -23,7 +23,7 @@ class CannotUseFeatureException extends RuntimeException
   protected $units;
 
   public function __construct(
-    $message = 'The feature cannot be used',
+    $message,
     Feature $feature,
     int $units,
     int $code = 0,
@@ -38,7 +38,7 @@ class CannotUseFeatureException extends RuntimeException
   /**
    * Get the feature.
    *
-   * @return int
+   * @return Feature
    */
   public function getFeature()
   {
