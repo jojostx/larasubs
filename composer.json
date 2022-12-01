@@ -41,7 +41,11 @@
             "Jojostx\\Larasubs\\Tests\\": "tests"
         }
     },
+    "allow-plugins": {
+        "phpstan/extension-installer": true
+    },
     "scripts": {
+        "pint": "vendor/bin/pint",
         "test": "vendor/bin/phpunit"
     },
     "config": {
