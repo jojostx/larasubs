@@ -78,7 +78,7 @@ class PlanSeeder extends Seeder
             'name'                    => 'silver',
             'description'             => 'Plan for medium businesses',
             'active'                  => true,
-            'price'                   => 100000 // price in the lowest currency value (kobo)
+            'price'                   => 100000, // price in the lowest currency value (kobo)
             'currency'                => 'NGN',
             'interval'                => 6,
             'interval_type'           => IntervalType::YEAR,
@@ -93,7 +93,7 @@ class PlanSeeder extends Seeder
             'name'                    => 'gold',
             'description'             => 'Plan for large businesses',
             'active'                  => true,
-            'price'                   => 10000000 // price in the lowest currency value (kobo)
+            'price'                   => 10000000, // price in the lowest currency value (kobo)
             'currency'                => 'NGN',
             'interval'                => 6,
             'interval_type'           => IntervalType::YEAR,
