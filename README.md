@@ -31,12 +31,14 @@ composer require jojostx/larasubs
 
 ## Usage
 
-To start using it, you just have to add the given trait to your `User` model (or any entity you want to have subscriptions):
+To start using it, you just have to add the `HasSubscriptions` trait to your `User` model (or any model you want to have subscriptions):
 
 ```php
 <?php
 namespace App\Models;
+
 use Jojostx\Larasubs\Models\Concerns\HasSubscriptions;
+
 class User
 {
     use HasSubscriptions;
@@ -52,6 +54,7 @@ First things first, you have to define the plans you'll offer. In the example be
 ```php
 <?php
 namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 use Jojostx\Larasubs\Enums\IntervalType;
 use Jojostx\Larasubs\Models\Models\Plan;
@@ -95,4 +98,8 @@ Everything here is quite simple, but it is worth to emphasize: by receiving the 
 
 #### Grace Period
 
-You can define a grace grace for each plan, so your users will not loose access to their features immediately when the subscription ends:
+You can define a trial period for each plan, so your users will can access a plan on trial before the subscription starts:
+
+#### Grace Period
+
+You can define a grace period for each plan, so your users will not loose access to their features immediately when the subscription ends:
