@@ -95,7 +95,8 @@ class Feature extends Model
         $pivot_table = config('larasubs.tables.feature_plan');
 
         return $this->belongsToMany(config('larasubs.models.plan'), $pivot_table)
-            ->withPivot('units');
+            ->withPivot('units')
+            ->withTimestamps();
     }
 
     /**

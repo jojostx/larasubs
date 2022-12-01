@@ -129,7 +129,8 @@ class Plan extends Model
 
         return $this->belongsToMany(config('larasubs.models.feature'), $pivot_table)
             ->using(config('larasubs.models.feature_plan'))
-            ->withPivot('units');
+            ->withPivot('units')
+            ->withTimestamps();
     }
 
     public function subscriptions()
