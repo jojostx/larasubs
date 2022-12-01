@@ -7,8 +7,8 @@
 <a href="https://github.com/jojostx/larasubs/actions?query=workflow%3Arun-tests+branch%3Amain">
 <img alt="GitHub Tests Action Status" src="https://img.shields.io/github/workflow/status/jojostx/larasubs/run-tests">
 </a>
-<a href="https://github.com/jojostx/larasubs/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain">
-<img alt="GitHub Code Style Action Status" src="https://img.shields.io/github/workflow/status/jojostx/larasubs/Check%20&%20fix%20styling?label=code%20style">
+<a href="https://github.com/jojostx/larasubs/actions?query=workflow%3Afix-code-style+branch%3Amain">
+<img alt="GitHub Code Style Action Status" src="https://github.com/jojostx/larasubs/actions/workflows/fix-code-style.yml/badge.svg">
 </a>
 <a href="https://packagist.org/packages/lucasdotvin/laravel-soulbscription">
 <img alt="Total Downloads" src="https://img.shields.io/packagist/dt/lucasdotvin/laravel-soulbscription.svg?style=flat-square">
