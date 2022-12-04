@@ -14,6 +14,7 @@ use Jojostx\Larasubs\Services\Period;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Translatable\HasTranslations;
+use Spatie\SchemalessAttributes\SchemalessAttributes;
 
 /**
  * @property int $id

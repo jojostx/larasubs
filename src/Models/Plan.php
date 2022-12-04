@@ -11,11 +11,11 @@ use Jojostx\Larasubs\Enums\IntervalType;
 use Jojostx\Larasubs\Models\Concerns\HandlesRecurrence;
 use Jojostx\Larasubs\Models\Concerns\HasSchemalessAttributes;
 use Jojostx\Larasubs\Services\Period;
-use Spatie\EloquentSortable\SortableTrait;
-use Spatie\SchemalessAttributes\SchemalessAttributes;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Translatable\HasTranslations;
+use Spatie\EloquentSortable\SortableTrait;
+use Spatie\SchemalessAttributes\SchemalessAttributes;
 
 /**
  * @property int $id
