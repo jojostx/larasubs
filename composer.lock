@@ -4,73 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4213fde3e9346e537c27d0526f5054eb",
+    "content-hash": "4feba5b32f4d9165d43271170e5df0f0",
     "packages": [
-        {
-            "name": "aglipanci/laravel-eloquent-case",
-            "version": "v1.4.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/aglipanci/laravel-eloquent-case.git",
-                "reference": "699fb50fb988498bcb0169f054e2700f6b5ff1e9"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/aglipanci/laravel-eloquent-case/zipball/699fb50fb988498bcb0169f054e2700f6b5ff1e9",
-                "reference": "699fb50fb988498bcb0169f054e2700f6b5ff1e9",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/database": "^8.0|^9.0",
-                "illuminate/support": "^8.0|^9.0",
-                "php": "^7.4|^8.0"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.6",
-                "nunomaduro/larastan": "^1.0",
-                "orchestra/testbench": "^6.23.0|^7.0.0",
-                "phpunit/phpunit": "^9.3.9"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "AgliPanci\\LaravelCase\\LaravelCaseServiceProvider"
-                    ],
-                    "aliases": {
-                        "CaseBuilder": "CaseBuilder"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "AgliPanci\\LaravelCase\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Agli Panci",
-                    "email": "agli.panci@gmail.com",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Eduard Lleshi",
-                    "email": "eduard.lleshi@gmail.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Adds CASE statement support to Laravel Query Builder.",
-            "homepage": "https://github.com/aglipanci/laravel-case",
-            "support": {
-                "issues": "https://github.com/aglipanci/laravel-eloquent-case/issues",
-                "source": "https://github.com/aglipanci/laravel-eloquent-case/tree/v1.4.0"
-            },
-            "time": "2022-10-20T11:00:52+00:00"
-        },
         {
             "name": "brick/math",
             "version": "0.10.2",
@@ -2231,6 +2166,81 @@
                 }
             ],
             "time": "2022-11-15T09:10:09+00:00"
+        },
+        {
+            "name": "spatie/laravel-schemaless-attributes",
+            "version": "2.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/laravel-schemaless-attributes.git",
+                "reference": "3ac6d63f36c631edfafa5f34d7a3885f47b96e48"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/laravel-schemaless-attributes/zipball/3ac6d63f36c631edfafa5f34d7a3885f47b96e48",
+                "reference": "3ac6d63f36c631edfafa5f34d7a3885f47b96e48",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^7.0|^8.0|^9.0",
+                "illuminate/database": "^7.0|^8.0|^9.0",
+                "illuminate/support": "^7.0|^8.0|^9.0",
+                "php": "^8.0",
+                "spatie/laravel-package-tools": "^1.4.3"
+            },
+            "require-dev": {
+                "brianium/paratest": "^6.2",
+                "mockery/mockery": "^1.4",
+                "nunomaduro/collision": "^5.3|^6.0",
+                "orchestra/testbench": "^6.15|^7.0",
+                "phpunit/phpunit": "^9.5.4"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Spatie\\SchemalessAttributes\\SchemalessAttributesServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\SchemalessAttributes\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Add schemaless attributes to Eloquent models",
+            "homepage": "https://github.com/spatie/laravel-schemaless-attributes",
+            "keywords": [
+                "laravel-schemaless-attributes",
+                "spatie"
+            ],
+            "support": {
+                "issues": "https://github.com/spatie/laravel-schemaless-attributes/issues",
+                "source": "https://github.com/spatie/laravel-schemaless-attributes/tree/2.3.0"
+            },
+            "funding": [
+                {
+                    "url": "https://spatie.be/open-source/support-us",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/spatie",
+                    "type": "github"
+                }
+            ],
+            "time": "2022-01-12T08:21:28+00:00"
         },
         {
             "name": "spatie/laravel-sluggable",

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Jojostx\Larasubs\Models\Concerns\HandlesRecurrence;
+use Jojostx\Larasubs\Models\Concerns\HasSchemalessAttributes;
 use Spatie\EloquentSortable\SortableTrait;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
@@ -17,7 +18,7 @@ use Spatie\Translatable\HasTranslations;
  * @property int $id
  * @property string $name
  * @property string $slug
- * @property string $description
+ * @property SchemalessAttributes $description
  * @property bool   $active
  * @property bool   $consumable
  * @property int $interval
@@ -36,6 +37,7 @@ class Feature extends Model
     use HasSlug;
     use SortableTrait;
     use HandlesRecurrence;
+    use HasSchemalessAttributes;
 
     protected $fillable = [
         'name',
@@ -60,7 +62,6 @@ class Feature extends Model
 
     public $translatable = [
         'name',
-        'description',
     ];
 
     public $sortable = [
@@ -104,7 +105,7 @@ class Feature extends Model
      */
     public function scopeWhereActive(Builder $query): Builder
     {
-        return $query->where('status', true);
+        return $query->where('active', true);
     }
 
     /**
@@ -112,7 +113,7 @@ class Feature extends Model
      */
     public function scopeWhereNotActive(Builder $query): Builder
     {
-        return $query->where('status', false);
+        return $query->where('active', false);
     }
 
     public function activate(): bool

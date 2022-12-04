@@ -26,6 +26,7 @@ class PlanFactory extends Factory
 
         return [
             'name' => $this->faker->words(asText: true),
+            'description' => ['tag' => 'ss'],
             'active' => true,
             'price' => 1000,
             'currency' => 'NGN',
