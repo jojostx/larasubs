@@ -9,8 +9,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Jojostx\Larasubs\Enums\IntervalType;
 use Jojostx\Larasubs\Models\Concerns\HandlesRecurrence;
+use Jojostx\Larasubs\Models\Concerns\HasSchemalessAttributes;
 use Jojostx\Larasubs\Services\Period;
 use Spatie\EloquentSortable\SortableTrait;
+use Spatie\SchemalessAttributes\SchemalessAttributes;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Translatable\HasTranslations;
@@ -19,7 +21,7 @@ use Spatie\Translatable\HasTranslations;
  * @property int $id
  * @property string $name
  * @property string $slug
- * @property string $description
+ * @property SchemalessAttributes $description
  * @property bool   $active
  * @property int    $price
  * @property string $currency
@@ -43,6 +45,7 @@ class Plan extends Model
     use SortableTrait;
     use HasSlug;
     use HandlesRecurrence;
+    use HasSchemalessAttributes;
 
     protected $fillable = [
         'name',
@@ -77,7 +80,7 @@ class Plan extends Model
         'sort_order' => 'integer',
     ];
 
-    public $translatable = ['name', 'description'];
+    public $translatable = ['name'];
 
     public $sortable = [
         'order_column_name' => 'sort_order',
@@ -143,7 +146,7 @@ class Plan extends Model
      */
     public function scopeWhereActive(Builder $query): Builder
     {
-        return $query->where('status', true);
+        return $query->where('active', true);
     }
 
     /**
@@ -151,7 +154,7 @@ class Plan extends Model
      */
     public function scopeWhereNotActive(Builder $query): Builder
     {
-        return $query->where('status', false);
+        return $query->where('active', false);
     }
 
     /**

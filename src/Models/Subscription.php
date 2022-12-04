@@ -11,6 +11,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Jojostx\Larasubs\Events;
 use Jojostx\Larasubs\Services\Period;
+use Spatie\SchemalessAttributes\SchemalessAttributes;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Translatable\HasTranslations;
@@ -18,6 +19,7 @@ use Spatie\Translatable\HasTranslations;
 /**
  * @property int $id
  * @property string $slug
+ * @property SchemalessAttributes $description
  * @property \Carbon\Carbon|null $starts_at
  * @property \Carbon\Carbon|null $ends_at
  * @property \Carbon\Carbon|null $cancels_at
@@ -37,6 +39,7 @@ class Subscription extends Model
     use HasSlug;
     use Concerns\EndsAndHasGracePeriod;
     use Concerns\HasFeatures;
+    use Concerns\HasSchemalessAttributes;
 
     /**
      * Subscription statuses
@@ -59,6 +62,8 @@ class Subscription extends Model
 
     protected $fillable = [
         'plan_id',
+        'subscribable_id',
+        'subscribable_type',
         'name',
         'slug',
         'description',
@@ -86,7 +91,6 @@ class Subscription extends Model
      */
     public $translatable = [
         'name',
-        'description',
     ];
 
     /**
