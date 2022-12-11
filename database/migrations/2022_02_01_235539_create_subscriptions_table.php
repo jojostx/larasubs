@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create(config('larasubs.tables.subscriptions'), function (Blueprint $table) {
+        Schema::create(config('larasubs.tables.subscriptions.name'), function (Blueprint $table) {
             $table->id();
             $this->subscribableMorph($table);
             $table->foreignIdFor(config('larasubs.models.plan'))
@@ -41,7 +41,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists(config('larasubs.tables.subscriptions'));
+        Schema::dropIfExists(config('larasubs.tables.subscriptions.name'));
     }
 
     /**

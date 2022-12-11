@@ -12,7 +12,7 @@ return [
     'tables' => [
         'plans' => 'plans',
         'features' => 'features',
-        'subscriptions' => 'subscriptions',
+        'subscriptions' => ['name' => 'subscriptions', 'uses_uuid' => true],
         'feature_plan' => 'feature_plan',
         'feature_subscription' => 'feature_subscription',
     ],
