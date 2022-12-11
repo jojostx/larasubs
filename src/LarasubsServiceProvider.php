@@ -2,6 +2,7 @@
 
 namespace Jojostx\Larasubs;
 
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
