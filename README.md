@@ -35,9 +35,7 @@ composer require jojostx/larasubs
 
 Publish resources (migrations and config files):
 ```bash
-php artisan vendor:publish --provider="Jojostx\Larasubs\LarasubsServiceProvider" --tag="larasubs-config"
-
-php artisan vendor:publish --provider="Jojostx\Larasubs\LarasubsServiceProvider" --tag="larasubs-migrations"
+php artisan vendor:publish --provider="Jojostx\Larasubs\LarasubsServiceProvider"
 ```
 
 ## Usage
