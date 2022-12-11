@@ -33,9 +33,11 @@ You can install the package via composer:
 composer require jojostx/larasubs
 ```
 
-Publish resources (migrations and config files):
+Publish resources (config and migrations files):
 ```bash
-php artisan vendor:publish --provider="Jojostx\Larasubs\LarasubsServiceProvider"
+php artisan vendor:publish --provider="Jojostx\Larasubs\LarasubsServiceProvider" --tag=larasubs-config
+
+php artisan vendor:publish --provider="Jojostx\Larasubs\LarasubsServiceProvider" --tag=larasubs-migrations
 ```
 
 ## Usage

@@ -84,38 +84,11 @@ class LarasubsServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__ . '/../config/larasubs.php' => config_path('larasubs.php'),
-            ], 'config');
+            ], 'larasubs-config');
 
             $this->publishes([
                 __DIR__ . '/../database/migrations' => database_path('migrations'),
-            ], 'migrations');
-
-            $this->publishes([
-                __DIR__.'/../database/migrations/create_feature_plan_table.php.stub' => $this->getMigrationFileName('create_feature_plan_table.php'),
-                __DIR__.'/../database/migrations/create_feature_subscription_table.php.stub' => $this->getMigrationFileName('create_feature_subscription_table.php'),
-                __DIR__.'/../database/migrations/create_features_table.php.stub' => $this->getMigrationFileName('create_features_table.php'),
-                __DIR__.'/../database/migrations/create_plans_table.php.stub' => $this->getMigrationFileName('create_plans_table.php.php'),
-                __DIR__.'/../database/migrations/create_subscriptions_table.php.stub' => $this->getMigrationFileName('create_subscriptions_table.php'),
-            ], 'migrations');
+            ], 'larasubs-migrations');
         }
-    }
-
-    /**
-     * Returns existing migration file if found, else uses the current timestamp.
-     *
-     * @return string
-     */
-    protected function getMigrationFileName($migrationFileName)
-    {
-        $timestamp = date('Y_m_d_His');
-
-        $filesystem = $this->app->make(Filesystem::class);
-
-        return Collection::make($this->app->databasePath() . DIRECTORY_SEPARATOR . 'migrations' . DIRECTORY_SEPARATOR)
-            ->flatMap(function ($path) use ($filesystem, $migrationFileName) {
-                return $filesystem->glob($path . '*_' . $migrationFileName);
-            })
-            ->push($this->app->databasePath() . "/migrations/{$timestamp}_{$migrationFileName}")
-            ->first();
     }
 }
