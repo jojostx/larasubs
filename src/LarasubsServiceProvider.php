@@ -2,8 +2,6 @@
 
 namespace Jojostx\Larasubs;
 
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 
@@ -51,7 +49,7 @@ class LarasubsServiceProvider extends ServiceProvider
      */
     protected function bootMigrations()
     {
-        if (!config('larasubs.database.cancel_migrations_autoloading') && $this->app->runningInConsole()) {
+        if (! config('larasubs.database.cancel_migrations_autoloading') && $this->app->runningInConsole()) {
             $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         }
     }
