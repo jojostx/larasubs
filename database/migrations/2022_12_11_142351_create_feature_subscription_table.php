@@ -41,7 +41,7 @@ return new class() extends Migration
     public function down()
     {
         $pivot_table = config('larasubs.tables.feature_subscription');
-        $pivot_table = $pivot_table ?? getPivotTableName(config('larasubs.tables.features'), config('larasubs.tables.subscriptions'));
+        $pivot_table = $pivot_table ?? getPivotTableName(config('larasubs.tables.features'), config('larasubs.tables.subscriptions.name'));
 
         Schema::dropIfExists($pivot_table);
     }

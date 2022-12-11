@@ -48,6 +48,8 @@ class Subscription extends Model
 
     const STATUS_OVERDUE = 'overdue';
 
+    const STATUS_TRAILLING = 'trialling';
+
     const STATUS_ACTIVE = 'active';
 
     const STATUS_CANCELLED = 'cancelled';
@@ -105,7 +107,7 @@ class Subscription extends Model
      */
     public function getTable(): string
     {
-        return config('larasubs.tables.subscriptions') ?? parent::getTable();
+        return config('larasubs.tables.subscriptions.name') ?? parent::getTable();
     }
 
     /**
@@ -133,6 +135,10 @@ class Subscription extends Model
      */
     protected function getStatus()
     {
+        if ($this->onTrial()) {
+            return self::STATUS_TRAILLING;
+        }
+
         if ($this->isActive()) {
             return self::STATUS_ACTIVE;
         }
