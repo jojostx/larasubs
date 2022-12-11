@@ -9,11 +9,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Jojostx\Larasubs\Models\Concerns\HandlesRecurrence;
 use Jojostx\Larasubs\Models\Concerns\HasSchemalessAttributes;
+use Spatie\EloquentSortable\SortableTrait;
+use Spatie\SchemalessAttributes\SchemalessAttributes;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Translatable\HasTranslations;
-use Spatie\EloquentSortable\SortableTrait;
-use Spatie\SchemalessAttributes\SchemalessAttributes;
 
 /**
  * @property int $id

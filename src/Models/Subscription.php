@@ -11,10 +11,10 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Jojostx\Larasubs\Events;
 use Jojostx\Larasubs\Services\Period;
+use Spatie\SchemalessAttributes\SchemalessAttributes;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Spatie\Translatable\HasTranslations;
-use Spatie\SchemalessAttributes\SchemalessAttributes;
 
 /**
  * @property int $id
