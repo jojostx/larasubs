@@ -441,7 +441,7 @@ class Subscription extends Model
             // Attach new plan to subscription
             return $this->forceFill([
                 'plan_id' => $plan->getKey(),
-                'plan_changed_at' => now()
+                'plan_changed_at' => now(),
             ])->save();
         });
 
@@ -747,7 +747,7 @@ class Subscription extends Model
     public function planWasChangedInTimePast(int $interval, $intervalType = 'day'): bool
     {
         \throw_if(! in_array($intervalType, ['day', 'week', 'month', 'year']), new InvalidPeriodParameterException());
-     
+
         $method = 'sub' . ucfirst($intervalType) . 's';
 
         $begin = now()->{$method}($interval);
