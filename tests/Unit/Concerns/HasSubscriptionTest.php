@@ -52,8 +52,8 @@ class HasSubscriptionsTest extends TestCase
     public function testModelDefinesGracePeriodEnd()
     {
         $plan = Plan::factory()
-          ->withGracePeriod()
-          ->createOne();
+            ->withGracePeriod()
+            ->createOne();
 
         $subscriber = User::factory()->createOne();
         $subscription = $subscriber->subscribeTo($plan);
@@ -110,7 +110,47 @@ class HasSubscriptionsTest extends TestCase
         $this->assertTrue($allSubs->contains($t_subscription));
     }
 
-    public function testModelGetLatestSubscription()
+    public function testModelCanGetSubscriptionsWithActivePlan()
+    {
+        Carbon::setTestNow(now());
+
+        $plan_1 = Plan::factory()->createOne();
+        $plan_2 = Plan::factory()->inactive()->createOne();
+
+        $subscriber = User::factory()->createOne();
+
+        $f_subscription = $subscriber->subscribeTo($plan_1);
+        $s_subscription = $subscriber->subscribeTo($plan_2);
+        $t_subscription = $subscriber->subscribeTo($plan_2);
+
+        $activeSubs = $subscriber->getSubscriptionsWithActivePlan();
+
+        $this->assertTrue($activeSubs->contains($f_subscription));
+        $this->assertFalse($activeSubs->contains($s_subscription));
+        $this->assertFalse($activeSubs->contains($t_subscription));
+    }
+
+    public function testModelCanGetSubscriptionsWithInactivePlan()
+    {
+        Carbon::setTestNow(now());
+
+        $plan_1 = Plan::factory()->createOne();
+        $plan_2 = Plan::factory()->inactive()->createOne();
+
+        $subscriber = User::factory()->createOne();
+
+        $f_subscription = $subscriber->subscribeTo($plan_1);
+        $s_subscription = $subscriber->subscribeTo($plan_2);
+        $t_subscription = $subscriber->subscribeTo($plan_2);
+
+        $inactiveSubs = $subscriber->getSubscriptionsWithInactivePlan();
+
+        $this->assertFalse($inactiveSubs->contains($f_subscription));
+        $this->assertTrue($inactiveSubs->contains($s_subscription));
+        $this->assertTrue($inactiveSubs->contains($t_subscription));
+    }
+
+    public function testModelCanGetLatestSubscription()
     {
         Carbon::setTestNow(now());
 

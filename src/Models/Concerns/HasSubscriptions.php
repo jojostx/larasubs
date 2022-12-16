@@ -22,7 +22,7 @@ trait HasSubscriptions
     public function subscription(): MorphOne
     {
         return $this->morphOne(config('larasubs.models.subscription'), 'subscribable')
-          ->ofMany('starts_at', 'MAX');
+            ->ofMany('starts_at', 'MAX');
     }
 
     /**
@@ -78,23 +78,23 @@ trait HasSubscriptions
     }
 
     /**
-     * Get all subscriptions with active plans.
-     *
-     * @todo
+     * Get all subscriptions with active plan.
      */
     public function getSubscriptionsWithActivePlan(): Collection
     {
-        return \collect([]);
+        return $this->subscriptions()->whereHas('plan', function ($query) {
+            $query->whereActive();
+        })->get();
     }
 
     /**
-     * Get all plans for inactive subscriptions.
-     *
-     * @todo
+     * Get all subscriptions with inactive plan.
      */
     public function getSubscriptionsWithInactivePlan(): Collection
     {
-        return \collect([]);
+        return $this->subscriptions()->whereHas('plan', function ($query) {
+            $query->whereNotActive();
+        })->get();
     }
 
     /**
@@ -118,11 +118,11 @@ trait HasSubscriptions
         $starts_at ??= now();
         $ends_at = $ends_at ?? $plan->calculateNextRecurrenceEnd($starts_at);
 
-        if ($plan->hasTrialPeriod() && ! $withoutTrial) {
+        if ($plan->hasTrialPeriod() && !$withoutTrial) {
             $trial_ends_at = $plan->calculateTrialPeriodEnd($starts_at);
         }
 
-        if ($plan->hasGracePeriod() && ! $withoutGrace) {
+        if ($plan->hasGracePeriod() && !$withoutGrace) {
             $grace_ends_at = $plan->calculateGracePeriodEnd($ends_at);
         }
 
@@ -171,7 +171,7 @@ trait HasSubscriptions
 
             SubscriptionTrialStarted::dispatchIf(
                 $subscription->onTrial() &&
-                  ($subscription->starts_at->isCurrentDay() || $subscription->starts_at->isPast()),
+                    ($subscription->starts_at->isCurrentDay() || $subscription->starts_at->isPast()),
                 $subscription
             );
         }
@@ -185,8 +185,8 @@ trait HasSubscriptions
     public function hasSubscriptionTo(Plan $plan): bool
     {
         return $this->subscription()
-          ->where('plan_id', $plan->getKey())
-          ->exists();
+            ->where('plan_id', $plan->getKey())
+            ->exists();
     }
 
     /**
@@ -195,9 +195,9 @@ trait HasSubscriptions
     public function hasActiveSubscriptionTo(Plan $plan): bool
     {
         return $this->subscriptions()
-          ->where('plan_id', $plan->getKey())
-          ->whereActive()
-          ->exists();
+            ->where('plan_id', $plan->getKey())
+            ->whereActive()
+            ->exists();
     }
 
     /**
@@ -206,9 +206,9 @@ trait HasSubscriptions
     public function hasInactiveSubscriptionTo(Plan $plan): bool
     {
         return $this->subscriptions()
-          ->where('plan_id', $plan->getKey())
-          ->whereNotActive()
-          ->exists();
+            ->where('plan_id', $plan->getKey())
+            ->whereNotActive()
+            ->exists();
     }
 
     /**
@@ -228,7 +228,7 @@ trait HasSubscriptions
      */
     public function isNotSubscribedTo(Plan $plan): bool
     {
-        return ! $this->isSubscribedTo($plan);
+        return !$this->isSubscribedTo($plan);
     }
 
     /**
@@ -244,6 +244,6 @@ trait HasSubscriptions
      */
     public function isNotActivelySubscribedTo(Plan $plan): bool
     {
-        return ! $this->isActivelySubscribedTo($plan);
+        return !$this->isActivelySubscribedTo($plan);
     }
 }
