@@ -2,6 +2,7 @@
 
 namespace Jojostx\Larasubs\Models;
 
+use Carbon\Exceptions\InvalidPeriodParameterException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,6 +24,7 @@ use Spatie\Translatable\HasTranslations;
  * @property \Carbon\Carbon|null $starts_at
  * @property \Carbon\Carbon|null $ends_at
  * @property \Carbon\Carbon|null $cancels_at
+ * @property \Carbon\Carbon|null $plan_changed_at
  * @property \Carbon\Carbon|null $trial_ends_at
  * @property \Carbon\Carbon|null $grace_ends_at
  * @property \Carbon\Carbon|null $created_at
@@ -55,6 +57,7 @@ class Subscription extends Model
     const STATUS_CANCELLED = 'cancelled';
 
     protected $dates = [
+        'plan_changed_at',
         'grace_ends_at',
         'trial_ends_at',
         'starts_at',
@@ -69,6 +72,7 @@ class Subscription extends Model
         'name',
         'slug',
         'description',
+        'plan_changed_at',
         'trial_ends_at',
         'grace_ends_at',
         'starts_at',
@@ -80,6 +84,7 @@ class Subscription extends Model
 
     protected $casts = [
         'slug' => 'string',
+        'plan_changed_at' => 'datetime',
         'trial_ends_at' => 'datetime',
         'grace_ends_at' => 'datetime',
         'starts_at' => 'datetime',
@@ -340,6 +345,18 @@ class Subscription extends Model
     }
 
     /**
+     * Scope a query to return subscriptions that have had their plan changed within the
+     * provided days from now.
+     */
+    public function scopeWherePlanChangedInDaysBeforeNow(Builder $query, int $dayRange = 3): Builder
+    {
+        $from = Carbon::now();
+        $to = Carbon::now()->subDays($dayRange);
+
+        return $query->whereBetween('plan_changed_at', [$from, $to]);
+    }
+
+    /**
      * Scope a query to return subscriptions that ends before the
      * provided days from now.
      */
@@ -424,6 +441,7 @@ class Subscription extends Model
             // Attach new plan to subscription
             return $this->forceFill([
                 'plan_id' => $plan->getKey(),
+                'plan_changed_at' => now()
             ])->save();
         });
 
@@ -718,6 +736,24 @@ class Subscription extends Model
         if ($this->grace_ends_at) {
             return $this->ends_at->isPast()
                 && $this->grace_ends_at->isFuture();
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if subscription's plan has been changed within the past $interval starting from now.
+     */
+    public function planWasChangedInTimePast(int $interval, $intervalType = 'day'): bool
+    {
+        \throw_if(! in_array($intervalType, ['day', 'week', 'month', 'year']), new InvalidPeriodParameterException());
+     
+        $method = 'sub' . ucfirst($intervalType) . 's';
+
+        $begin = now()->{$method}($interval);
+
+        if ($this->plan_changed_at) {
+            return $this->plan_changed_at->greaterThan($begin);
         }
 
         return false;

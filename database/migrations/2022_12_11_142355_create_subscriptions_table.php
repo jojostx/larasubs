@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->json('description')->nullable();
 
+            $table->timestamp('plan_changed_at')->nullable();
             $table->timestamp('grace_ends_at')->nullable();
             $table->timestamp('trial_ends_at')->nullable();
             $table->timestamp('starts_at')->nullable();
