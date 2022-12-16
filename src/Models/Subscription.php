@@ -483,7 +483,7 @@ class Subscription extends Model
      */
     public function renew(?Carbon $endDate = null): bool
     {
-        if (!$this->isEnded()) {
+        if (! $this->isEnded()) {
             return false;
         }
 
@@ -544,7 +544,7 @@ class Subscription extends Model
      */
     public function reactivate(): bool
     {
-        if ($this->isCancelled() && !$this->ended()) {
+        if ($this->isCancelled() && ! $this->ended()) {
             $this->cancels_at = null;
 
             $saved = $this->save();
@@ -559,7 +559,7 @@ class Subscription extends Model
 
     protected function getRenewedEnd(?Carbon $endDate = null): Carbon
     {
-        if (!empty($endDate)) {
+        if (! empty($endDate)) {
             return $endDate;
         }
 
@@ -609,7 +609,7 @@ class Subscription extends Model
      */
     public function notStarted()
     {
-        return !$this->started();
+        return ! $this->started();
     }
 
     /**
@@ -617,7 +617,7 @@ class Subscription extends Model
      */
     public function isActive(): bool
     {
-        return !($this->isEnded() || $this->isCancelledImmediately());
+        return ! ($this->isEnded() || $this->isCancelledImmediately());
     }
 
     /**
@@ -625,7 +625,7 @@ class Subscription extends Model
      */
     public function isInactive(): bool
     {
-        return !$this->isActive();
+        return ! $this->isActive();
     }
 
     /**
@@ -651,7 +651,7 @@ class Subscription extends Model
      */
     public function onTrial(): bool
     {
-        return !is_null($this->trial_ends_at) ? $this->trial_ends_at->isFuture() : false;
+        return ! is_null($this->trial_ends_at) ? $this->trial_ends_at->isFuture() : false;
     }
 
     /**
@@ -659,7 +659,7 @@ class Subscription extends Model
      */
     public function isCancelled(): bool
     {
-        return !is_null($this->cancels_at);
+        return ! is_null($this->cancels_at);
     }
 
     /**
@@ -667,7 +667,7 @@ class Subscription extends Model
      */
     public function notCancelled()
     {
-        return !$this->isCancelled();
+        return ! $this->isCancelled();
     }
 
     /**
@@ -712,7 +712,7 @@ class Subscription extends Model
      */
     public function isEnded(): bool
     {
-        return !is_null($this->ends_at) ? $this->ends_at->isPast() : false;
+        return ! is_null($this->ends_at) ? $this->ends_at->isPast() : false;
     }
 
     /**
