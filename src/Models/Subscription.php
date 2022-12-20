@@ -620,7 +620,7 @@ class Subscription extends Model
      */
     public function isActive(): bool
     {
-        return ! ($this->isEnded() || $this->isCancelledImmediately());
+        return ! ($this->isEnded() || $this->isPastCancelled());
     }
 
     /**
