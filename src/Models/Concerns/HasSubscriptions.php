@@ -118,11 +118,11 @@ trait HasSubscriptions
         $starts_at ??= now();
         $ends_at = $ends_at ?? $plan->calculateNextRecurrenceEnd($starts_at);
 
-        if ($plan->hasTrialPeriod() && !$withoutTrial) {
+        if ($plan->hasTrialPeriod() && ! $withoutTrial) {
             $trial_ends_at = $plan->calculateTrialPeriodEnd($starts_at);
         }
 
-        if ($plan->hasGracePeriod() && !$withoutGrace) {
+        if ($plan->hasGracePeriod() && ! $withoutGrace) {
             $grace_ends_at = $plan->calculateGracePeriodEnd($ends_at);
         }
 
@@ -228,7 +228,7 @@ trait HasSubscriptions
      */
     public function isNotSubscribedTo(Plan $plan): bool
     {
-        return !$this->isSubscribedTo($plan);
+        return ! $this->isSubscribedTo($plan);
     }
 
     /**
@@ -244,6 +244,6 @@ trait HasSubscriptions
      */
     public function isNotActivelySubscribedTo(Plan $plan): bool
     {
-        return !$this->isActivelySubscribedTo($plan);
+        return ! $this->isActivelySubscribedTo($plan);
     }
 }
