@@ -25,12 +25,12 @@ class SubscriptionTest extends TestCase
     public function test_model_can_retrieve_plan()
     {
         $plan = Plan::factory()
-          ->create();
+            ->create();
 
         $subscriptions = Subscription::factory()
-          ->count($subscriptionsCount = $this->faker->randomDigitNotNull())
-          ->for($plan)
-          ->create();
+            ->count($subscriptionsCount = $this->faker->randomDigitNotNull())
+            ->for($plan)
+            ->create();
 
         $this->assertEquals($subscriptionsCount, $plan->subscriptions()->count());
 
@@ -42,15 +42,15 @@ class SubscriptionTest extends TestCase
     public function test_model_can_retrieve_subcriber()
     {
         $plan = Plan::factory()
-          ->create();
+            ->create();
 
         $subscriber = User::factory()->create();
 
         $subscriptions = Subscription::factory()
-          ->count($this->faker->randomDigitNotNull())
-          ->for($plan)
-          ->for($subscriber, 'subscriber')
-          ->create();
+            ->count($this->faker->randomDigitNotNull())
+            ->for($plan)
+            ->for($subscriber, 'subscriber')
+            ->create();
 
         $subscriptions->each(function ($subscription) use ($plan, $subscriber) {
             $this->assertEquals($plan->getKey(), $subscription->plan->getKey());
@@ -61,20 +61,20 @@ class SubscriptionTest extends TestCase
     public function test_model_can_retrieve_features()
     {
         $features = Feature::factory()
-          ->count($featuresCount = $this->faker->randomDigitNotNull())
-          ->create();
+            ->count($featuresCount = $this->faker->randomDigitNotNull())
+            ->create();
 
         $plan = Plan::factory()
-          ->hasAttached($features)
-          ->create();
+            ->hasAttached($features)
+            ->create();
 
         $subscriber = User::factory()->create();
 
         $subscriptions = Subscription::factory()
-          ->count($this->faker->randomDigitNotNull())
-          ->for($plan)
-          ->for($subscriber, 'subscriber')
-          ->create();
+            ->count($this->faker->randomDigitNotNull())
+            ->for($plan)
+            ->for($subscriber, 'subscriber')
+            ->create();
 
         $subscriptions->each(function ($subscription) use ($featuresCount) {
             // check if plan features count is equal to the features count for the sub
@@ -93,11 +93,11 @@ class SubscriptionTest extends TestCase
         $subscriber = User::factory()->create();
 
         $subscription = Subscription::factory()
-          ->for($old_plan)
-          ->for($subscriber, 'subscriber')
-          ->create([
-              'ends_at' => now()->subDays(1),
-          ]);
+            ->for($old_plan)
+            ->for($subscriber, 'subscriber')
+            ->create([
+                'ends_at' => now()->subDays(1),
+            ]);
 
         Event::fake();
 
@@ -125,11 +125,11 @@ class SubscriptionTest extends TestCase
         $plan = Plan::factory()->create();
         $subscriber = User::factory()->create();
         $subscription = Subscription::factory()
-          ->for($plan)
-          ->for($subscriber, 'subscriber')
-          ->create([
-              'ends_at' => now()->subDays(1),
-          ]);
+            ->for($plan)
+            ->for($subscriber, 'subscriber')
+            ->create([
+                'ends_at' => now()->subDays(1),
+            ]);
 
         $expectedEndedAt = $plan->calculateNextRecurrenceEnd($subscription->ends_at)->toDateTimeString();
 
@@ -154,11 +154,11 @@ class SubscriptionTest extends TestCase
         $plan = Plan::factory()->create();
         $subscriber = User::factory()->create();
         $subscription = Subscription::factory()
-          ->for($plan)
-          ->for($subscriber, 'subscriber')
-          ->create([
-              'ends_at' => now()->subDays(2),
-          ]);
+            ->for($plan)
+            ->for($subscriber, 'subscriber')
+            ->create([
+                'ends_at' => now()->subDays(2),
+            ]);
 
         $expectedEndedAt = $plan->calculateNextRecurrenceEnd($subscription->ends_at)->toDateTimeString();
 
@@ -183,10 +183,10 @@ class SubscriptionTest extends TestCase
         $plan = Plan::factory()->create();
         $subscriber = User::factory()->create();
         $subscription = Subscription::factory()
-          ->for($plan)
-          ->for($subscriber, 'subscriber')
-          ->notStarted()
-          ->create();
+            ->for($plan)
+            ->for($subscriber, 'subscriber')
+            ->notStarted()
+            ->create();
 
         Event::fake();
 
@@ -207,10 +207,10 @@ class SubscriptionTest extends TestCase
         $plan = Plan::factory()->create();
         $subscriber = User::factory()->create();
         $subscription = Subscription::factory()
-          ->for($plan)
-          ->for($subscriber, 'subscriber')
-          ->notStarted()
-          ->create();
+            ->for($plan)
+            ->for($subscriber, 'subscriber')
+            ->notStarted()
+            ->create();
 
         Event::fake();
 
@@ -224,21 +224,21 @@ class SubscriptionTest extends TestCase
         ]);
     }
 
-    public function test_model_can_cancel()
+    public function test_model_can_be_cancelled()
     {
         Carbon::setTestNow(now());
 
         $plan = Plan::factory()->create();
         $subscriber = User::factory()->create();
         $subscription = Subscription::factory()
-          ->for($plan)
-          ->for($subscriber, 'subscriber')
-          ->notStarted()
-          ->create();
+            ->for($plan)
+            ->for($subscriber, 'subscriber')
+            ->notStarted()
+            ->create();
 
         Event::fake();
 
-        $subscription->cancel();
+        $subscription->cancel(now());
 
         Event::assertDispatched(SubscriptionCancelled::class);
 
@@ -255,9 +255,9 @@ class SubscriptionTest extends TestCase
         $plan = Plan::factory()->create();
         $subscriber = User::factory()->create();
         $subscription = Subscription::factory()
-          ->for($plan)
-          ->for($subscriber, 'subscriber')
-          ->create();
+            ->for($plan)
+            ->for($subscriber, 'subscriber')
+            ->create();
 
         Event::fake();
 
@@ -272,17 +272,46 @@ class SubscriptionTest extends TestCase
         ]);
     }
 
+    public function test_model_can_be_reactivated()
+    {
+        Carbon::setTestNow(now());
+
+        $plan = Plan::factory()->create();
+        $subscriber = User::factory()->create();
+        $subscription = Subscription::factory()
+            ->for($plan)
+            ->for($subscriber, 'subscriber')
+            ->notStarted()
+            ->create();
+
+        Event::fake();
+
+        $subscription->cancel(now());
+
+        Event::assertDispatched(SubscriptionCancelled::class);
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $subscription->id,
+            'cancels_at' => now(),
+        ]);
+
+        $subscription->reactivate();
+
+        $this->assertTrue($subscription->notCancelled());
+        $this->assertNotEmpty($subscription->ends_at);
+    }
+
     public function test_model_considers_grace_period_on_overdue()
     {
         Carbon::setTestNow(now());
 
         $subscriber = User::factory()->create();
         $subscription = Subscription::factory()
-          ->for($subscriber, 'subscriber')
-          ->create([
-              'grace_ends_at' => now()->addDay(),
-              'ends_at' => now()->subDay(),
-          ]);
+            ->for($subscriber, 'subscriber')
+            ->create([
+                'grace_ends_at' => now()->addDay(),
+                'ends_at' => now()->subDay(),
+            ]);
 
         $this->assertTrue($subscription->isOnGracePeriod());
     }
@@ -290,11 +319,11 @@ class SubscriptionTest extends TestCase
     public function test_model_where_active_scope()
     {
         Subscription::factory()
-          ->count($this->faker()->randomDigitNotNull())
-          ->started()
-          ->notEnded()
-          ->notCancelled()
-          ->create();
+            ->count($this->faker()->randomDigitNotNull())
+            ->started()
+            ->notEnded()
+            ->notCancelled()
+            ->create();
 
         $allSubscriptions = Subscription::get();
         $activeSubscriptions = Subscription::whereActive()->get();
@@ -309,18 +338,18 @@ class SubscriptionTest extends TestCase
     public function test_model_where_not_active_scope()
     {
         Subscription::factory()
-          ->count($this->faker()->randomDigitNotNull())
-          ->started()
-          ->notEnded()
-          ->notCancelled()
-          ->create();
+            ->count($this->faker()->randomDigitNotNull())
+            ->started()
+            ->notEnded()
+            ->notCancelled()
+            ->create();
 
         $inactiveSubscriptions = Subscription::factory()
-          ->count($inactiveSubscriptionCount = $this->faker()->randomDigitNotNull())
-          ->started()
-          ->overdue()
-          ->notCancelled()
-          ->create();
+            ->count($inactiveSubscriptionCount = $this->faker()->randomDigitNotNull())
+            ->started()
+            ->overdue()
+            ->notCancelled()
+            ->create();
 
         $notActiveSubscriptions = Subscription::whereNotActive()->get();
 
@@ -334,18 +363,18 @@ class SubscriptionTest extends TestCase
     public function test_model_returns_not_started_subscriptions_on_not_active_scope()
     {
         Subscription::factory()
-          ->count($this->faker()->randomDigitNotNull())
-          ->started()
-          ->notEnded()
-          ->notCancelled()
-          ->create();
+            ->count($this->faker()->randomDigitNotNull())
+            ->started()
+            ->notEnded()
+            ->notCancelled()
+            ->create();
 
         $notStartedSubscriptions = Subscription::factory()
-          ->count($notStartedSubscriptionCount = $this->faker()->randomDigitNotNull())
-          ->notEnded()
-          ->notStarted()
-          ->notCancelled()
-          ->create();
+            ->count($notStartedSubscriptionCount = $this->faker()->randomDigitNotNull())
+            ->notEnded()
+            ->notStarted()
+            ->notCancelled()
+            ->create();
 
         $notActiveSubscriptions = Subscription::whereNotActive()->get();
 
@@ -359,18 +388,18 @@ class SubscriptionTest extends TestCase
     public function test_model_returns_overdue_subscriptions_on_not_active_scope()
     {
         Subscription::factory()
-          ->count($this->faker()->randomDigitNotNull())
-          ->started()
-          ->notEnded()
-          ->notCancelled()
-          ->create();
+            ->count($this->faker()->randomDigitNotNull())
+            ->started()
+            ->notEnded()
+            ->notCancelled()
+            ->create();
 
         $endedSubscriptions = Subscription::factory()
-          ->count($endedSubscriptionCount = $this->faker()->randomDigitNotNull())
-          ->started()
-          ->overdue()
-          ->notCancelled()
-          ->create();
+            ->count($endedSubscriptionCount = $this->faker()->randomDigitNotNull())
+            ->started()
+            ->overdue()
+            ->notCancelled()
+            ->create();
 
         $notActiveSubscriptions = Subscription::whereNotActive()->get();
 
@@ -383,18 +412,18 @@ class SubscriptionTest extends TestCase
     public function test_model_returns_cancelled_subscriptions_on_not_active_scope()
     {
         Subscription::factory()
-          ->count($this->faker()->randomDigitNotNull())
-          ->started()
-          ->notEnded()
-          ->notCancelled()
-          ->create();
+            ->count($this->faker()->randomDigitNotNull())
+            ->started()
+            ->notEnded()
+            ->notCancelled()
+            ->create();
 
         $cancelledSubscription = Subscription::factory()
-          ->count($cancelledSubscriptionCount = $this->faker()->randomDigitNotNull())
-          ->started()
-          ->notEnded()
-          ->cancelled()
-          ->create();
+            ->count($cancelledSubscriptionCount = $this->faker()->randomDigitNotNull())
+            ->started()
+            ->notEnded()
+            ->cancelled()
+            ->create();
 
         $returnedSubscriptions = Subscription::whereNotActive()->get();
 
@@ -407,18 +436,18 @@ class SubscriptionTest extends TestCase
     public function test_model_returns_only_cancelled_subscriptions_with_scope()
     {
         Subscription::factory()
-          ->count($this->faker()->randomDigitNotNull())
-          ->started()
-          ->notEnded()
-          ->notCancelled()
-          ->create();
+            ->count($this->faker()->randomDigitNotNull())
+            ->started()
+            ->notEnded()
+            ->notCancelled()
+            ->create();
 
         $cancelledSubscription = Subscription::factory()
-          ->count($cancelledSubscriptionCount = $this->faker()->randomDigitNotNull())
-          ->started()
-          ->notEnded()
-          ->cancelled()
-          ->create();
+            ->count($cancelledSubscriptionCount = $this->faker()->randomDigitNotNull())
+            ->started()
+            ->notEnded()
+            ->cancelled()
+            ->create();
 
         $returnedSubscriptions = Subscription::whereCancelled()->get();
 
@@ -431,20 +460,20 @@ class SubscriptionTest extends TestCase
     public function test_model_returns_only_not_cancelled_subscriptions_with_scope()
     {
         Subscription::factory()
-          ->count($this->faker()->randomDigitNotNull())
-          ->started()
-          ->notEnded()
-          ->notCancelled()
-          ->cancelled()
-          ->create();
+            ->count($this->faker()->randomDigitNotNull())
+            ->started()
+            ->notEnded()
+            ->notCancelled()
+            ->cancelled()
+            ->create();
 
         $notCancelledSubscription = Subscription::factory()
-          ->count($notCancelledSubscriptionCount = $this->faker()->randomDigitNotNull())
-          ->started()
-          ->notEnded()
-          ->notCancelled()
-          ->notCancelled()
-          ->create();
+            ->count($notCancelledSubscriptionCount = $this->faker()->randomDigitNotNull())
+            ->started()
+            ->notEnded()
+            ->notCancelled()
+            ->notCancelled()
+            ->create();
 
         $returnedSubscriptions = Subscription::whereNotCancelled()->get();
 
@@ -525,17 +554,17 @@ class SubscriptionTest extends TestCase
     {
         $startedModelsCount = $this->faker()->randomDigitNotNull();
         Subscription::factory()
-          ->count($startedModelsCount)
-          ->create([
-              'starts_at' => now()->subDay(),
-              'ends_at' => now()->addDays(7),
-          ]);
+            ->count($startedModelsCount)
+            ->create([
+                'starts_at' => now()->subDay(),
+                'ends_at' => now()->addDays(7),
+            ]);
 
         $overdueModelsCount = $this->faker()->randomDigitNotNull();
         $overdueModels = Subscription::factory()
-          ->count($overdueModelsCount)
-          ->overdue()
-          ->create();
+            ->count($overdueModelsCount)
+            ->overdue()
+            ->create();
 
         $returnedSubscriptions = Subscription::whereOverdue();
 

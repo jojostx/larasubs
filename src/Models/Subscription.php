@@ -500,15 +500,13 @@ class Subscription extends Model
     }
 
     /**
-     * Cancel a subscription
-     * - sets the **cancels_at** attribute to the $cancelDate.
-     * - if $immediately is set to true, the **ends_at** attribute
-     * is set to the $cancelDate.
-     * - if $cancelDate is not given, the current date is used.
+     * Cancel a subscription by setting the **cancels_at** attribute to the **$cancelDate**.
+     * - if $cancelDate is not given, the ends_at date is used, if ends_at is null, the current date is used.
+     * - if $immediately is set to true, the **ends_at** attribute is set to the **$cancelDate**.
      */
     public function cancel(?Carbon $cancelDate = null, $immediately = false): bool
     {
-        $this->cancels_at = $cancelDate ?? now();
+        $this->cancels_at = $cancelDate ?? $this->ends_at ?? now();
 
         if ($immediately) {
             $this->ends_at = $this->cancels_at;
@@ -546,6 +544,11 @@ class Subscription extends Model
     {
         if ($this->isCancelled() && ! $this->ended()) {
             $this->cancels_at = null;
+
+            // calcute a new end date based on the current plan's start date and interval type
+            if (filled($this->starts_at)) {
+                $this->ends_at = $this->plan->calculateNextRecurrenceEnd($this->starts_at);
+            }
 
             $saved = $this->save();
 
@@ -617,7 +620,7 @@ class Subscription extends Model
      */
     public function isActive(): bool
     {
-        return ! ($this->isEnded() || $this->isCancelledImmediately());
+        return ! ($this->isEnded() || $this->isPastCancelled());
     }
 
     /**
