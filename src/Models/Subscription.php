@@ -506,7 +506,7 @@ class Subscription extends Model
      */
     public function cancel(?Carbon $cancelDate = null, $immediately = false): bool
     {
-        $this->cancels_at =  $cancelDate ?? $this->ends_at ?? now();
+        $this->cancels_at = $cancelDate ?? $this->ends_at ?? now();
 
         if ($immediately) {
             $this->ends_at = $this->cancels_at;
