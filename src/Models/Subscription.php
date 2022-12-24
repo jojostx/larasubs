@@ -144,12 +144,12 @@ class Subscription extends Model
             return self::STATUS_TRAILLING;
         }
 
-        if ($this->isActive()) {
-            return self::STATUS_ACTIVE;
-        }
-
         if ($this->isCancelled()) {
             return self::STATUS_CANCELLED;
+        }
+
+        if ($this->isActive()) {
+            return self::STATUS_ACTIVE;
         }
 
         if ($this->isOverdue()) {
