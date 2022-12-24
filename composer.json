@@ -2,6 +2,7 @@
     "name": "jojostx/larasubs",
     "description": "Flexible plans and subscription management system for Laravel, with the required tools to run your SAAS like services efficiently",
     "type": "library",
+    "keywords": ["laravel", "subscriptions", "saas", "plans", "billing"],
     "license": "MIT",
     "authors": [
         {
