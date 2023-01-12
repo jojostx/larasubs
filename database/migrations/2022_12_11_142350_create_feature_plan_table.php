@@ -16,15 +16,13 @@ return new class() extends Migration
         Schema::create(config('larasubs.tables.feature_plan'), function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(config('larasubs.models.feature'))
-              ->cascadeOnDelete();
+                ->cascadeOnDelete();
             $table->foreignIdFor(config('larasubs.models.plan'))
-              ->cascadeOnDelete();
+                ->cascadeOnDelete();
 
             $table->integer('units')->nullable();
 
             $table->timestamps();
-
-            $this->generateUniqueCompositeIndex($table);
         });
     }
 
@@ -39,18 +37,5 @@ return new class() extends Migration
         $pivot_table = $pivot_table ?? getPivotTableName(config('larasubs.tables.features'), config('larasubs.tables.plans'));
 
         Schema::dropIfExists($pivot_table);
-    }
-
-    public function generateUniqueCompositeIndex(Blueprint &$table)
-    {
-        if (
-            is_string($feature = config('larasubs.models.feature')) &&
-            is_string($plan = config('larasubs.models.plan'))
-        ) {
-            $feature = new $feature;
-            $plan = new $plan;
-
-            $table->unique([$feature->getForeignKey(), $plan->getForeignKey()]);
-        }
     }
 };
