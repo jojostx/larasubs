@@ -147,11 +147,11 @@ class Subscription extends Model
         if ($this->isCancelled()) {
             return self::STATUS_CANCELLED;
         }
-        
+
         if ($this->isActive()) {
             return self::STATUS_ACTIVE;
         }
-        
+
         if ($this->isOverdue()) {
             return self::STATUS_OVERDUE;
         }
