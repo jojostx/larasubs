@@ -17,6 +17,6 @@ class SubscriptionCancelled
         public Model $subscription,
         public bool $wasCancelledImmediately
     ) {
-      //
+        //
     }
 }

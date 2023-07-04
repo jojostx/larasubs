@@ -16,6 +16,6 @@ class SubscriptionCreated
     public function __construct(
         public Model $subscription,
     ) {
-      //
+        //
     }
 }

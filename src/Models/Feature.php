@@ -89,8 +89,6 @@ class Feature extends Model
 
     /**
      * The feature may belong to many plans.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function plans(): BelongsToMany
     {
