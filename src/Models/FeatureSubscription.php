@@ -46,8 +46,6 @@ class FeatureSubscription extends Model
 
     /**
      * Get the table associated with the model.
-     *
-     * @return string
      */
     public function getTable(): string
     {
@@ -149,8 +147,6 @@ class FeatureSubscription extends Model
 
     /**
      * Check whether usage has ended.
-     *
-     * @return bool
      */
     public function ended(): bool
     {
@@ -163,8 +159,6 @@ class FeatureSubscription extends Model
 
     /**
      * Check whether usage has not ended.
-     *
-     * @return bool
      */
     public function notEnded(): bool
     {

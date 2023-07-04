@@ -16,6 +16,6 @@ class SubscriptionRenewed
     public function __construct(
         public Model $subscription,
     ) {
-      //
+        //
     }
 }

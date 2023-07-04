@@ -230,12 +230,12 @@ class PlanTest extends TestCase
     public function test_model_can_retrieve_features()
     {
         $features = Feature::factory()
-          ->count($featuresCount = $this->faker->randomDigitNotNull())
-          ->create();
+            ->count($featuresCount = $this->faker->randomDigitNotNull())
+            ->create();
 
         $plan = Plan::factory()
-          ->hasAttached($features)
-          ->create();
+            ->hasAttached($features)
+            ->create();
 
         $this->assertEquals($featuresCount, $plan->features()->count());
 
@@ -247,12 +247,12 @@ class PlanTest extends TestCase
     public function test_model_can_retrieve_features_with_units()
     {
         $features = Feature::factory()
-          ->count($featuresCount = $this->faker->randomDigitNotNull())
-          ->create();
+            ->count($featuresCount = $this->faker->randomDigitNotNull())
+            ->create();
 
         $plan = Plan::factory()
-          ->hasAttached($features, ['units' => 5])
-          ->create();
+            ->hasAttached($features, ['units' => 5])
+            ->create();
 
         $this->assertEquals($featuresCount, $plan->features()->count());
 
@@ -264,15 +264,15 @@ class PlanTest extends TestCase
     public function test_model_can_retrieve_subscriptions()
     {
         $plan = Plan::factory()
-          ->create();
+            ->create();
 
         $subscriptions = Subscription::factory()
-          ->for($plan)
-          ->count($subscriptionsCount = $this->faker->randomDigitNotNull())
-          ->started()
-          ->notEnded()
-          ->notCancelled()
-          ->create();
+            ->for($plan)
+            ->count($subscriptionsCount = $this->faker->randomDigitNotNull())
+            ->started()
+            ->notEnded()
+            ->notCancelled()
+            ->create();
 
         $this->assertEquals($subscriptionsCount, $plan->subscriptions()->count());
         $subscriptions->each(function ($subscription) use ($plan) {
