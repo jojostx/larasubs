@@ -228,7 +228,7 @@ class Subscription extends Model
      */
     public function scopeWhereStarted(Builder $query): Builder
     {
-        return  $query->where('starts_at', '<=', now());
+        return $query->where('starts_at', '<=', now());
     }
 
     /**
@@ -236,7 +236,7 @@ class Subscription extends Model
      */
     public function scopeWhereNotStarted(Builder $query): Builder
     {
-        return  $query->where('starts_at', '>', now());
+        return $query->where('starts_at', '>', now());
     }
 
     /**

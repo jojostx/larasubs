@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $this->subscribableMorph($table);
             $table->foreignIdFor(config('larasubs.models.plan'))
-              ->cascadeOnDelete()
-              ->cascadeOnUpdate();
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
 
             $table->json('name');
             $table->string('slug')->unique();

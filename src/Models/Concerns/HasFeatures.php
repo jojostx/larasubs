@@ -107,17 +107,17 @@ trait HasFeatures
         // for the subcription and for the $feature.
         /** @var FeatureSubscription */
         $usage = $this->usage()
-          ->firstOrCreate(
-              [
-                  'subscription_id' => $this->getKey(),
-                  'feature_id' => $feature->getKey(),
-              ],
-              [
-                  'active' => true,
-                  'used' => $used,
-                  'ends_at' => $this->ends_at,
-              ]
-          );
+            ->firstOrCreate(
+                [
+                    'subscription_id' => $this->getKey(),
+                    'feature_id' => $feature->getKey(),
+                ],
+                [
+                    'active' => true,
+                    'used' => $used,
+                    'ends_at' => $this->ends_at,
+                ]
+            );
 
         return $usage->refresh();
     }

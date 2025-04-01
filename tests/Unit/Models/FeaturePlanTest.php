@@ -17,7 +17,7 @@ class FeaturePlanTest extends TestCase
     public function test_model_can_retrieve_plan()
     {
         $feature = Feature::factory()
-          ->create();
+            ->create();
 
         $plan = Plan::factory()->create();
         $plan->features()->attach($feature);
@@ -30,7 +30,7 @@ class FeaturePlanTest extends TestCase
     public function test_model_can_retrieve_feature()
     {
         $feature = Feature::factory()
-          ->create();
+            ->create();
 
         $plan = Plan::factory()->create();
         $plan->features()->attach($feature);
@@ -43,7 +43,7 @@ class FeaturePlanTest extends TestCase
     public function test_model_has_units()
     {
         $feature = Feature::factory()
-          ->create();
+            ->create();
 
         $plan = Plan::factory()->create();
         $plan->features()->attach($feature);

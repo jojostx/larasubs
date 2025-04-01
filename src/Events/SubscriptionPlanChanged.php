@@ -19,6 +19,6 @@ class SubscriptionPlanChanged
         public Plan $old_plan,
         public Plan $new_plan
     ) {
-      //
+        //
     }
 }

@@ -18,8 +18,8 @@ class EndsWithGracePeriodScope implements Scope
     {
         $builder->where(
             fn (Builder $query) => $query
-            ->where('ends_at', '>', now())
-            ->orWhere('grace_ends_at', '>', now())
+                ->where('ends_at', '>', now())
+                ->orWhere('grace_ends_at', '>', now())
         );
     }
 
